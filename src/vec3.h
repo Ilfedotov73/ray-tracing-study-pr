@@ -3,8 +3,10 @@
 
 #include <cmath>
 
+typedef unsigned int u32;
+
 class vec3
-{
+{																					
 public:
 	double e[3];
 
@@ -17,8 +19,8 @@ public:
 
 	vec3 operator-() const { return vec3(-e[0], -e[1], -e[2]); }
 
-	double  operator[](int i) const { return e[i]; }
-	double& operator[](int i) { return e[i]; }
+	double  operator[](u32 i) const { return e[i]; }
+	double& operator[](u32 i) { return e[i]; }
 
 	vec3& operator+=(const vec3& v)
 	{

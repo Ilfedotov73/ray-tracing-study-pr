@@ -22,10 +22,13 @@
 
 int main()
 {
+	std::ios_base::sync_with_stdio(false);
+
+	/* render */
 	std::cout << "P3\n" << IMAGE_WIDTH << ' ' << IMAGE_HEIGHT << "\n255\n";
-	for (int j = 0; j < IMAGE_HEIGHT; j++) {
+	for (int j = 0; j < IMAGE_HEIGHT; ++j) {
 		std::clog << "\rScanlines remaining: " << (IMAGE_HEIGHT - j) << ' ' << std::flush;
-		for (int i = 0; i < IMAGE_WIDTH; i++) {
+		for (int i = 0; i < IMAGE_WIDTH; ++i) {
 			double r, g, b;
 			r = double(i) / (IMAGE_WIDTH - 1);
 			g = double(j) / (IMAGE_HEIGHT - 1);
