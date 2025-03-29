@@ -15,6 +15,8 @@
   принадлежности конкретного компонента (r,g,b) к конкретному цвету.
 ***********************************************************************************/
 
+#include "vec3.h"
+#include "color.h"
 #include <iostream>
 
 #define IMAGE_WIDTH 256
@@ -29,19 +31,13 @@ int main()
 	for (int j = 0; j < IMAGE_HEIGHT; ++j) {
 		std::clog << "\rScanlines remaining: " << (IMAGE_HEIGHT - j) << ' ' << std::flush;
 		for (int i = 0; i < IMAGE_WIDTH; ++i) {
-			double r, g, b;
-			r = double(i) / (IMAGE_WIDTH - 1);
-			g = double(j) / (IMAGE_HEIGHT - 1);
-			b = 0.0;
+			/* нормализацмя */
+			double r = double(i) / (IMAGE_WIDTH - 1);
+			double g = double(j) / (IMAGE_HEIGHT - 1);
+			double b = 0.0;
 
-			/* масштабирование до целочисленного */
-			int ir, ig, ib;
-			ir = int(255.999 * r);
-			ig = int(255.999 * g);
-			ib = int(255.999 * b);
-
-			std::cout << ir << ' ' << ig << ' ' << ib << '\n';
-
+			color pix_color(r,g,b);
+			write_color(std::cout, pix_color);
 		}
 	}
 	std::clog << "\rDone.                 \n";
