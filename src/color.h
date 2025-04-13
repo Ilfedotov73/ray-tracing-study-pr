@@ -26,5 +26,4 @@ void write_color(std::ostream& out, const color& pix_color)
 
 	out << rbyte << ' ' << gbyte << ' ' << bbyte << '\n';
 }
-
 #endif
