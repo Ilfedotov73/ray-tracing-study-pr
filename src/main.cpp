@@ -15,7 +15,7 @@
 * “.е. дл€ каждого компонента конкретного пиксел€ определ€етс€ степень 
   принадлежности конкретного компонента (r,g,b) к конкретному цвету.
 *
-* cmake --build . --config release
+* cmake --build . --config Release
 ***********************************************************************************/
 
 #include "ray.h"
@@ -38,7 +38,7 @@ int main()
 	IMAGE_HEIGHT = (IMAGE_HEIGHT < 1) ? 1 : IMAGE_HEIGHT; // ¬ысота изображени€ не должна быть < 1.
 
 	/* viewport settings */
-	double VIEWPORT_HEIGHT = 2.0; 
+	double VIEWPORT_HEIGHT = 2.0; // высота просмотра выбрана произвольно
 	double VIEWPORT_WIDTH = VIEWPORT_HEIGHT * (double(IMAGE_WIDTH)/IMAGE_HEIGHT);
 	vec3 VIEWPORT_U = vec3(VIEWPORT_WIDTH, 0, 0);
 	vec3 VIEWPORT_V = vec3(0, -VIEWPORT_HEIGHT, 0);
@@ -54,7 +54,7 @@ int main()
 
 	/* calculate location upper left pixel */
 	point3 VIEWPORT_UPPER_LEFT = CAMERA_CENTER - vec3(0, 0, FOCAL_LENGTH) - VIEWPORT_U/2 - VIEWPORT_V/2;
-	point3 PIXEL100_LOC = VIEWPORT_UPPER_LEFT + 0.5 * (PIXEL_DELTA_U + PIXEL_DELTA_V);
+	point3 PIXEL_LOC_00 = VIEWPORT_UPPER_LEFT + 0.5 * (PIXEL_DELTA_U + PIXEL_DELTA_V);
 
 	std::ios_base::sync_with_stdio(0);
 	/* render */
@@ -62,11 +62,11 @@ int main()
 	for (int j = 0; j < IMAGE_HEIGHT; ++j) {
 		std::clog << "\rScanlines remaining: " << (IMAGE_HEIGHT - j) << ' ' << std::flush;
 		for (int i = 0; i < IMAGE_WIDTH; ++i) {
-			point3 pixel_center = PIXEL100_LOC + (i * PIXEL_DELTA_U) + (j * PIXEL_DELTA_V);
+			point3 pixel_center = PIXEL_LOC_00 + (i * PIXEL_DELTA_U) + (j * PIXEL_DELTA_V);
 			vec3 ray_direction = pixel_center - CAMERA_CENTER;
-			ray ray_orig(CAMERA_CENTER,ray_direction);
+			ray r(CAMERA_CENTER,ray_direction);
 
-			color pix_color = ray_color(ray_orig);
+			color pix_color = ray_color(r);
 			write_color(std::cout, pix_color);
 		}
 	}
