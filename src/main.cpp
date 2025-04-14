@@ -1,6 +1,13 @@
 /***********************************************************************************
-* Данный файл записывает изображение в формате P3, т.е. цвета даны в ASCII - 24 бита 
-* на пиксель (по 8 бит на r,g,b). 
+* Данная программа рассчитывает значения матрицы пискслей и записывает их в формате 
+* P3, т.е. цвета даны в ASCII - 24 бита на пиксель (по 8 бит на r,g,b). 
+* 
+* Алгоритм вычисления цвета конкретного пикселя основан на методе трассировки лучей.
+* Суть которого: для каждого пикселя viewport рассчитывается его проекция в трех-
+* мерном пространстве, относительно точки P(0,0). После чего задается объект типа 
+* ray(camera_center, ray_direction) и вызывается ray_color().
+* 
+* //todo ray_color()
 * 
 * Выходной файл ((>) file.ppm) содержит значения для пикселя в количестве 256 x 256, 
 * значения которых не превышают 255.
@@ -23,6 +30,7 @@
 #include "color.h"
 #include <iostream>
 
+// todo дескрипшен   !!!
 color ray_color(const ray& ray) { 
 	vec3 unit_direction = unitv(ray.direction());
 	double a = 0.5 * (unit_direction.y() + 1.0);
@@ -52,7 +60,7 @@ int main()
 	vec3 PIXEL_DELTA_U = VIEWPORT_U / IMAGE_WIDTH;
 	vec3 PIXEL_DELTA_V = VIEWPORT_V / IMAGE_HEIGHT;
 
-	/* calculate location upper left pixel */
+	/* calculate location upper left pixel/pixel(0,0) */
 	point3 VIEWPORT_UPPER_LEFT = CAMERA_CENTER - vec3(0, 0, FOCAL_LENGTH) - VIEWPORT_U/2 - VIEWPORT_V/2;
 	point3 PIXEL_LOC_00 = VIEWPORT_UPPER_LEFT + 0.5 * (PIXEL_DELTA_U + PIXEL_DELTA_V);
 
