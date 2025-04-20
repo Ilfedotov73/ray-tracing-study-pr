@@ -38,11 +38,7 @@ P.camera_center к P.direction, P(t) = Q + td. Таким образом, решить уравнение,
 discriminant >= 0.															      */
 bool hit_sphere(const point3& sp_center, double radius, const ray& r)
 {
-	vec3 v = sp_center - r.origin(); // вектор от точки r.direction к sp_center. 
-									 // Пример: пусть sp_center = (1,1,1), 
-									 //			r.direction = (3,4,12) - внутри сферы
-									 //			r.orig = (0,0,0)
-									 //			тогда v = vector((3,4,12), (1,1,1) - (0,0,0)).
+	vec3 v = sp_center - r.origin(); //вектор от точки r.direction к sp_center
 	double a = dot(r.direction(), r.direction());
 	double b = -2.0*dot(r.direction(), v);
 	double c = dot(v,v) - radius*radius;
