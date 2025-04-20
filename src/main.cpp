@@ -7,8 +7,6 @@
 * мерном пространстве, относительно точки P(0,0). ѕосле чего задаетс€ объект типа 
 * ray(camera_center, ray_direction) и вызываетс€ ray_color().
 * 
-* //todo ray_color()
-* 
 * ¬ыходной файл ((>) file.ppm) содержит значени€ дл€ пиксел€ в количестве 256 x 256, 
 * значени€ которых не превышают 255.
 *
@@ -32,11 +30,32 @@
 #include "color.h"
 #include <iostream>
 
+/* hit_sphere() решает уравнение x^2 + y^2 + z^2 = r^2 как квадратное уравнение с
+использование формулы нахождени€ дискриминанта. ”равнение x^2 + y^2 + z^2 = r^2
+представленое в виде (C - P(t))(C - P(t)) = r^2, где P(t) €вл€етс€ лучом из 
+P.camera_center к P.direction, P(t) = Q + td. “аким образом, решить уравнение,
+значит найти t, при которых(-ой) выполн€етс€ (C-P(t))^2 = r^2, т.е. если 
+discriminant >= 0.															      */
+bool hit_sphere(const point3& sp_center, double radius, const ray& r)
+{
+	vec3 v = sp_center - r.origin(); // вектор от точки r.direction к sp_center. 
+									 // пусть sp_center = (1,1,1), 
+									 // r.direction = (3,4,12) -> 3^2 + 4^2 + 12^2 = 13^2 (поверхность сферы)
+									 // r.orig = (0,0,0)
+									 // тогда v = vector((3,4,12), (1,1,1) - (0,0,0)).
+	double a = dot(r.direction(), r.direction());
+	double b = -2.0*dot(r.direction(), v);
+	double c = dot(v,v) - radius*radius;
+	double discriminant = b*b - 4*a*c;
+	return (discriminant>=0);
+}
+
 /* ray_color() линейно смешивает белыый и синий цвета в зависимости от высоты 
 направлени€ луча после нормализации, т.е. масштабировани€ до unit vector, и
-преобразовани€ к диапазону [0,1] (линейное масштабирование) */
-color ray_color(const ray& ray) {  
-	vec3 unit_direction = unitv(ray.direction());
+преобразовани€ к диапазону [0,1] (линейное масштабирование).				      */
+color ray_color(const ray& r) {  
+	if(hit_sphere(point3(0,0,-1), 0.5, r)) { return color(1,0,0); }
+	vec3 unit_direction = unitv(r.direction());
 	double a = 0.5 * (unit_direction.y() + 1.0); // [-1;1] -> [0;1], 0.0 <= a <= 1.0
 	/* linear interpolation */
 	return (1.0-a)*color(1.0,1.0,1.0) + a*color(0.5, 0.7, 1.0); // a = 1.0 -> синий, a = 0.0 -> белый
@@ -60,12 +79,11 @@ int main()
 	double FOCAL_LENGTH = 1.0; 
 	point3 CAMERA_CENTER(0,0,0);
 
-	
 	/* calculate delta vectotrs */
 	vec3 PIXEL_DELTA_U = VIEWPORT_U / IMAGE_WIDTH;
 	vec3 PIXEL_DELTA_V = VIEWPORT_V / IMAGE_HEIGHT;
 
-	/* calculate location upper left pixel/pixel(0,0) */
+	/* calculate location viewport upper left/pixel(0,0) */
 	point3 VIEWPORT_UPPER_LEFT = CAMERA_CENTER - vec3(0, 0, FOCAL_LENGTH) - VIEWPORT_U/2 - VIEWPORT_V/2;
 	point3 PIXEL_LOC_00 = VIEWPORT_UPPER_LEFT + 0.5 * (PIXEL_DELTA_U + PIXEL_DELTA_V);
 
