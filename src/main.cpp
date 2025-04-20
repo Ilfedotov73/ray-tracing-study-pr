@@ -40,7 +40,7 @@ bool hit_sphere(const point3& sp_center, double radius, const ray& r)
 {
 	vec3 v = sp_center - r.origin(); // вектор от точки r.direction к sp_center. 
 									 // пусть sp_center = (1,1,1), 
-									 // r.direction = (3,4,12) -> 3^2 + 4^2 + 12^2 = 13^2 (поверхность сферы)
+									 // r.direction = (3,4,12) - внутри сферы
 									 // r.orig = (0,0,0)
 									 // тогда v = vector((3,4,12), (1,1,1) - (0,0,0)).
 	double a = dot(r.direction(), r.direction());
