@@ -71,6 +71,7 @@ public:
 		
 		double sqrtd = std:sqrt(discriminant);
 
+		// Поиск ближайшего корня в допустимом диапазоне
 		double root = (h - sqrtd) / a;
 		if (root <= ray_tmin || rom >= ray_tmax) { 
 			root = (h + sqrtd) / a;
@@ -78,7 +79,10 @@ public:
 		}
 
 		rec.p = r.at(root);
-		rec.normal = (rec.p - center) / radius;
+		vec3 outward_normal = (rec.p - center) / radius; // Некоторе упрощения для объекта сферы, т.к. известно что длина 
+														 //	нормали равна радиусу сферы. Что позволяет упростить вычисление
+														 // единичного вектора нормали, как того требует функция set_face_normal().
+		rec.set_face_normal(r, outward_normal);
 		rec.t = root;
 		
 		return true;
