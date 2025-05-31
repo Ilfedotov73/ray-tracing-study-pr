@@ -37,9 +37,6 @@
 #ifndef VEC3_H
 #define VEC3_H
 
-#include <cmath>
-#include <iostream>
-
 typedef unsigned int u32;
 
 class vec3

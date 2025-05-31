@@ -2,13 +2,11 @@
 #define SPHERE_H
 
 #include "hittable.h"
-#include "vec3.h"
 
 class sphere : public hittable {
 private:
 	point3 center;
 	double radius;
-};
 public:
 	sphere(const point3& center, double radius) : center(center), radius(std::fmax(0, radius)) {}
 
@@ -69,11 +67,11 @@ public:
 		double discriminant = h*h - a*c;
 		if (discriminant < 0) { return false; }
 		
-		double sqrtd = std:sqrt(discriminant);
+		double sqrtd = std::sqrt(discriminant);
 
 		// Поиск ближайшего корня в допустимом диапазоне
 		double root = (h - sqrtd) / a;
-		if (root <= ray_tmin || rom >= ray_tmax) { 
+		if (root <= ray_tmin || root >= ray_tmax) { 
 			root = (h + sqrtd) / a;
 			if (root <= ray_tmin || root >= ray_tmax) { return false; }
 		}
@@ -87,4 +85,5 @@ public:
 		
 		return true;
 	}
+};
 #endif
