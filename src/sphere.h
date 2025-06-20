@@ -57,7 +57,7 @@ public:
 	 * (-(-2h) +- sqrt((-2h)^2 - 4ac))/2a = (2h +- sqrt(h^2 - ac))/2a =
 	 * = (h +- sqrt(h^2 - ac))/a
 	*/
-	bool hit(const ray& r, double ray_tmin, double ray_tmax, hit_record& rec) const override
+	bool hit(const ray& r, interval ray_t, hit_record& rec) const override
 	{
 		vec3 oc = center - r.origin();
 		double a = r.direction().length_squared();
@@ -71,9 +71,9 @@ public:
 
 		// Поиск ближайшего корня в допустимом диапазоне
 		double root = (h - sqrtd) / a;
-		if (root <= ray_tmin || root >= ray_tmax) { 
+		if (!ray_t.surrounds(root)) { 
 			root = (h + sqrtd) / a;
-			if (root <= ray_tmin || root >= ray_tmax) { return false; }
+			if (!ray_t.surrounds(root)) { return false; }
 		}
 
 		rec.p = r.at(root);
