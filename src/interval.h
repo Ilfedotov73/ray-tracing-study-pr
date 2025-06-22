@@ -12,9 +12,16 @@ public:
 
 	double size() const { return max - min; }
 	
-	bool contrains(double x) const { return min <= x && x <= max; }
+	bool contrains(double x) const { return min <= x && x <= max; } // нестрогое неравенство
 
-	bool surrounds(double x) const { return min < x && x < max; }
+	bool surrounds(double x) const { return min < x && x < max; } // строгое неравенство
+
+	double clamp(double x) const
+	{
+		if (x < min) { return min; }
+		if (x > max) { return max;}
+		return x;
+	}
 }; 
 
 const interval interval::empty		= interval(+INF, -INF);

@@ -5,11 +5,11 @@
 class camera
 {
 private:
-	int    IMAGE_HEIGHT;
-	point3 CAMERA_CENTER;
-	point3 PIXEL_LOC_00;
-	vec3   PIXEL_DELTA_U;
-	vec3   PIXEL_DELTA_V;
+	int    IMAGE_HEIGHT;  // Ширина визуализируемого изображения в пикселях
+	point3 CAMERA_CENTER; // Центр камеры 
+	point3 PIXEL_LOC_00;  // Позиция пикселя в (0,0)
+	vec3   PIXEL_DELTA_U; // Смешение пикслея по горизонтали
+	vec3   PIXEL_DELTA_V; // Смещение пикселя по вертикали
 
 	void initialize()
 	{
@@ -20,8 +20,8 @@ private:
 		/* viewport settings */
 		double VIEWPORT_HEIGHT = 2.0; // высота просмотра выбрана произвольно
 		double VIEWPORT_WIDTH = VIEWPORT_HEIGHT * (double(IMAGE_WIDTH) / IMAGE_HEIGHT);
-		vec3 VIEWPORT_U = vec3(VIEWPORT_WIDTH, 0, 0);
-		vec3 VIEWPORT_V = vec3(0, -VIEWPORT_HEIGHT, 0);
+		vec3   VIEWPORT_U = vec3(VIEWPORT_WIDTH, 0, 0);
+		vec3   VIEWPORT_V = vec3(0, -VIEWPORT_HEIGHT, 0);
 
 		/* camera settings */
 		double FOCAL_LENGTH = 1.0;
@@ -67,10 +67,25 @@ private:
 		return (1.0 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0); // a = 1.0 -> синий, a = 0.0 -> белый
 	}
 	
+	ray get_rey(int i, int j) const 
+	{
+		vec3 offset = sample_square();
+		point3 pixel_sample = PIXEL_LOC_00 + ((i + offset.x()) * PIXEL_DELTA_U) 
+										   + ((j + offset.y()) * PIXEL_DELTA_V);
+
+		point3 ray_origin = CAMERA_CENTER;
+		point3 ray_direction = pixel_sample - ray_origin;
+
+		return ray(ray_origin, ray_direction);
+	}
+
+	vec3 sample_square() const { return vec3(random_double() - 0.5, random_double() - 0.5, 0); }
+
 public:
 	/* image settings */
-	double ASPECT_RATIO = 1.0;
-	int    IMAGE_WIDTH = 100;
+	double ASPECT_RATIO = 1.0; // Отношение ширины изображения к высоте.
+	int    IMAGE_WIDTH = 100; // Ширина визуализируемого изображения в пикселях.
+	int	   SAMPLES_PER_PIXEL = 10;
 
 	void render(const hittable& world)
 	{
