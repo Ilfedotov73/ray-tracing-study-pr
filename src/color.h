@@ -20,10 +20,10 @@ void write_color(std::ostream& out, const color& pix_color)
 	double b = pix_color.z();
 
 	/* преобразование значений компонента в диапазоне [0,1] в диапазон байтов [0,255] */
-	static const interval intensity(0.000, 0.999);
-	int rbyte = int(255.999 * intensity.clamp(r));
-	int gbyte = int(255.999 * intensity.clamp(g));
-	int bbyte = int(255.998 * intensity.clamp(b));
+	static const interval intensity(0.000, 0.999); // clipping
+	int rbyte = int(255.999 * intensity.clip(r));
+	int gbyte = int(255.999 * intensity.clip(g));
+	int bbyte = int(255.998 * intensity.clip(b));
 
 	out << rbyte << ' ' << gbyte << ' ' << bbyte << '\n';
 }

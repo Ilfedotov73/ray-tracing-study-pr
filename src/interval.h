@@ -16,7 +16,7 @@ public:
 
 	bool surrounds(double x) const { return min < x && x < max; } // строгое неравенство
 
-	double clamp(double x) const
+	double clip(double x) const
 	{
 		if (x < min) { return min; }
 		if (x > max) { return max;}
