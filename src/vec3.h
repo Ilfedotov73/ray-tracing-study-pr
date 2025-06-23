@@ -31,13 +31,15 @@
 * 
 * Опредлена функция нахождения единиченого вектора: unitv().
 * 
+* Определный функции: random_unit_vector() и random_on_hemisphere() для вычисления
+* отрежений лучей от диффузной поверхности с помощью метода отбрасывания, для 
+* генерации отраженных лучей внутри области единичной сферы.
+* 
 * Все функции определены как inline - встраиваемые функции.
 ***********************************************************************************/
 
 #ifndef VEC3_H
 #define VEC3_H
-
-typedef unsigned int u32;
 
 class vec3
 {																					
@@ -53,8 +55,8 @@ public:
 
 	vec3 operator-() const { return vec3(-e[0], -e[1], -e[2]); }
 
-	double  operator[](u32 i) const { return e[i]; }
-	double& operator[](u32 i) { return e[i]; }
+	double  operator[](int i) const { return e[i]; }
+	double& operator[](int i) { return e[i]; }
 
 	vec3& operator+=(const vec3& v)
 	{
@@ -78,6 +80,9 @@ public:
 	double length() const { return std::sqrt(length_squared()); }
 	
 	double length_squared() const { return e[0]*e[0] + e[1]*e[1] + e[2]*e[2]; }
+
+	static vec3 random() { return vec3(random_double(), random_double(), random_double()); }
+	static vec3 random(double min, double max) { return vec3(random_double(min, max), random_double(min, max), random_double(min, max)); }
 };
 
 using point3 = vec3;
@@ -146,5 +151,26 @@ inline vec3 cross(const vec3& u, const vec3& v)
 
 /* функция нахождения единичегого вектора - нормализация */
 inline vec3 unitv(const vec3& v) { return v/v.length(); } 
+
+/* Reflection */
+inline vec3 random_unit_vector()
+{
+	for (;;) {
+		vec3 p = vec3::random(-1,1);                                 // Создаем случайный вектор в области единичной сфер
+		double lensq = p.length_squared();
+		if (1e-160 < lensq && lensq <= 1) { return p/sqrt(lensq); }  // Нормализуем о единичного вектора 
+																	 // 10^-160 чтобы избежать фиктивного вектора при векторе,
+																	 // компоненты которого очень близки к нулю.
+	}
+}
+
+inline vec3 random_on_hemisphere(const vec3& normal)
+{
+	vec3 rndv_in_unit_sp = random_unit_vector();
+	if (dot(rndv_in_unit_sp, normal) > 0.0) { return rndv_in_unit_sp; } // Если случайный вектор находится в правильной 
+																		// полусфере, то скалярное произведение случайного 
+																		// вектора на нормаль будет положительно
+	else { return -rndv_in_unit_sp; }
+}
 
 #endif

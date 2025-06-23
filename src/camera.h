@@ -78,7 +78,11 @@ private:
 	{
 		hit_record rec;
 		if (world.hit(r, interval(0, INF), rec)) {
-			return 0.5 * (rec.normal + color(1, 1, 1)); // 0.5*(normal + 1) -- линейное масштабирование до диапазона значений [0,1]
+			vec3 direction = random_on_hemisphere(rec.normal);
+
+			// При каждом отражении луч затемняет вычисляемое значение пикселя, в направление
+			// которого был отражен луч, на 50%.
+			return 0.5 * ray_color(ray(rec.p, direction), world);
 		}
 
 		/* sky */
