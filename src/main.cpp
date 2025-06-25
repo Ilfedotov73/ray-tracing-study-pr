@@ -40,6 +40,7 @@ int main()
 	cam.ASPECT_RATIO = 16.0 / 9.0;
 	cam.IMAGE_WIDTH  = 400;
 	cam.SAMPLES_PER_PIXEL = 100;
+	cam.MAX_DEPTH = 50;
 
 	cam.render(WORLD);
 }
