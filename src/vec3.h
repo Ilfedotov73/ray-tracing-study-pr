@@ -152,13 +152,13 @@ inline vec3 cross(const vec3& u, const vec3& v)
 /* функци€ нахождени€ единичегого вектора - нормализаци€ */
 inline vec3 unitv(const vec3& v) { return v/v.length(); } 
 
-/* Reflection */
+/* Random method by reflection */
 inline vec3 random_unit_vector()
 {
 	for (;;) {
 		vec3 p = vec3::random(-1,1);                                 // —оздаем случайный вектор в области единичной сфер
 		double lensq = p.length_squared();
-		if (1e-160 < lensq && lensq <= 1) { return p/sqrt(lensq); }  // Ќормализуем о единичного вектора 
+		if (1e-160 < lensq && lensq <= 1) { return p/sqrt(lensq); }  // Ќормализуем до единичного вектора 
 																	 // 10^-160 чтобы избежать фиктивного вектора при векторе,
 																	 // компоненты которого очень близки к нулю.
 	}

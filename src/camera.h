@@ -91,7 +91,8 @@ private:
 
 		hit_record rec;
 		if (world.hit(r, interval(0.001, INF), rec)) {                 
-			vec3 direction = random_on_hemisphere(rec.normal);
+			//vec3 direction = random_on_hemisphere(rec.normal); // равномерное рассеивание
+			vec3 direction = rec.normal + random_unit_vector();
 
 			// При каждом отражении луч затемняет вычисляемое значение пикселя, в направление
 			// которого был отражен луч, на 50%.
