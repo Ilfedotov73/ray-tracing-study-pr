@@ -32,8 +32,11 @@
 * Опредлена функция нахождения единиченого вектора: unitv().
 * 
 * Определный функции: random_unit_vector() и random_on_hemisphere() для вычисления
-* отрежений лучей от диффузной поверхности с помощью метода отбрасывания, для 
-* генерации отраженных лучей внутри области единичной сферы.
+* отрежений лучей от диффузной поверхности с помощью метода отбрасывания и
+* ламбертова распределения, для генерации отраженных лучей внутри области 
+* единичной сферы.
+* 
+* > Метод отбрасывания -- равномерное распределение.
 * 
 * Все функции определены как inline - встраиваемые функции.
 ***********************************************************************************/
@@ -83,6 +86,13 @@ public:
 
 	static vec3 random() { return vec3(random_double(), random_double(), random_double()); }
 	static vec3 random(double min, double max) { return vec3(random_double(min, max), random_double(min, max), random_double(min, max)); }
+
+	bool near_zero() const
+	{
+		double s = 1e-8; // 0.0000001
+		return(std::fabs(e[0]) < s) && (std::fabs(e[1]) < s) && (std::fabs(e[2]) <s );
+	}
+
 };
 
 using point3 = vec3;
@@ -172,5 +182,7 @@ inline vec3 random_on_hemisphere(const vec3& normal)
 																		// вектора на нормаль будет положительно
 	else { return -rndv_in_unit_sp; }
 }
+
+inline vec3 reflect(const vec3& v, const vec3& n) { return v - 2*dot(v,n)*n; }
 
 #endif

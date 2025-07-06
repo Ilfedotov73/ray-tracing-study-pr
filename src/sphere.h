@@ -7,8 +7,10 @@ class sphere : public hittable {
 private:
 	point3 center;
 	double radius;
+	shared_ptr<material> mat;
 public:
-	sphere(const point3& center, double radius) : center(center), radius(std::fmax(0, radius)) {}
+	sphere(const point3& center, double radius, shared_ptr<material> mat) 
+		: center(center), radius(std::fmax(0, radius)), mat(mat) {}
 
 	/* hit() решает уравнение x^2 + y^2 + z^2 = r^2 как квадратное уравнение с
 	 * использование формулы нахождения дискриминанта. Уравнение x^2 + y^2 + z^2 = r^2
@@ -82,6 +84,7 @@ public:
 														 // единичного вектора нормали, как того требует функция set_face_normal().
 		rec.set_face_normal(r, outward_normal);
 		rec.t = root;
+		rec.mat = mat;
 		
 		return true;
 	}

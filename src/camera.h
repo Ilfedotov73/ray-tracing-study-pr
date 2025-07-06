@@ -19,6 +19,7 @@
 #define CANERA_H
 
 #include "hittable.h"
+#include "material.h"
 class camera
 {
 private:
@@ -73,6 +74,10 @@ private:
 	 * поточности). „тобы избежать возникновани€ ошибки, каждый луч ограничен заданным
 	 * числом отражений.
 	 * 
+	 * ќтражение каждого луча специфично дл€ материала пересеченной поверхности, оно 
+	 * либо задаетс€ распределением ламберта, либо зеракально отражаетс€ по длине 
+	 * проекции луча к нормали. Ћогика отражени€ инкапсулирована материалу.
+	 * 
 	 * ≈сли пересечение с объектами не происходит,то рассчитываетс€ градиент от белого
 	 * к синему, в зависимости о высоты пиксел€. „ем ближе значение a к единице, тем
 	 * ближе значение к синему (0.5, 0.7, 1.0) - рассчет неба дл€ сцены.
@@ -86,17 +91,16 @@ private:
 	*/
 	color ray_color(const ray& r, int max_depth, const hittable& world) const
 	{
-
 		if (max_depth <= 0) { return color(0,0,0); }
 
 		hit_record rec;
 		if (world.hit(r, interval(0.001, INF), rec)) {                 
-			//vec3 direction = random_on_hemisphere(rec.normal); // равномерное рассеивание
-			vec3 direction = rec.normal + random_unit_vector();
-
-			// ѕри каждом отражении луч затемн€ет вычисл€емое значение пиксел€, в направление
-			// которого был отражен луч, на 50%.
-			return 0.5 * ray_color(ray(rec.p, direction), max_depth-1, world);
+			ray   scattered;	// –ассеивающий луч
+			color attenuation;	// ÷вет затухани€ интенсивности глобального освещени€ (цвета градиента sky).
+			/* ¬ычислени€ отражени€ на основе материала поверхности */
+			if (rec.mat->scatter(r, rec, attenuation, scattered))
+				return attenuation * ray_color(scattered, max_depth-1, world);
+			return color(0,0,0);
 		}
 
 		/* sky */

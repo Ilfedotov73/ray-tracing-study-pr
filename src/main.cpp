@@ -26,6 +26,7 @@
 #include "hittable_list.h"
 #include "sphere.h"
 #include "camera.h"
+#include "material.h"
 
 int main() 
 {
@@ -33,8 +34,16 @@ int main()
 
 	/* world */
 	hittable_list WORLD;
-	WORLD.add(make_shared<sphere>(point3(0,0,-1), 0.5));
-	WORLD.add(make_shared<sphere>(point3(0,-100.5,-1), 100));
+	
+	shared_ptr<material> mat1 = make_shared<lambertian>(color(0.8,0.8,0.0));
+	shared_ptr<material> mat2 = make_shared<lambertian>(color(0.1,0.2,0.5));
+	shared_ptr<material> mat3 = make_shared<metal>(color(0.8,0.8,0.8));
+	shared_ptr<material> mat4 = make_shared<metal>(color(0.8,0.6,0.2));
+
+	WORLD.add(make_shared<sphere>(point3(0.0, -100.5, -1.0), 100.0, mat1));
+	WORLD.add(make_shared<sphere>(point3(0.0,  0.0,   -1.2), 0.5, mat2));
+	WORLD.add(make_shared<sphere>(point3(-1.0, 0.0,   -1.0), 0.5, mat3));
+	WORLD.add(make_shared<sphere>(point3(1.0,  0.0,   -1.0), 0.5, mat4));
 
 	camera cam;
 	cam.ASPECT_RATIO = 16.0 / 9.0;

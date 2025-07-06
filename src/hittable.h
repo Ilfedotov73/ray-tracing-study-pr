@@ -1,10 +1,16 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
+class material;
+
 class hit_record {
 public:
 	point3 p;
 	vec3 normal;
+	shared_ptr<material> mat; // указатель на реализацию абстрактного материала, для 
+							  // вызова его функции (scatter()). Так ray_color() сможет
+							  // определить, к какому материалу принадлежит поверхность
+							  // и как от нее рассеивать свет.
 	double t;
 	bool front_face;
 
