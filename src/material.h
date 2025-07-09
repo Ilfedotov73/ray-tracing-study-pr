@@ -42,18 +42,33 @@ class metal : public material
 {
 private:
 	color albedo;
+	double fuzz;
 public:
-	metal(const color& albedo) : albedo(albedo) {}
+	metal(const color& albedo, double fuzz) : albedo(albedo), fuzz(fuzz < 1 ? fuzz:1) {}
 
 	bool scatter(const ray& r_in, const hit_record& rec,
 		 color& attenuation, ray& scattered) const override
 	{
-		vec3 reflected = reflect(r_in.direction(), rec.normal); // Вектор отражения луча по длине прекции луча к 
-																// нормали.
-		scattered = ray(rec.p, reflected);						// Генерация рассеивающего луча
-		attenuation = albedo;									// Доля отраженного цвета от поверхности (затухание
-																// глобального освещения.
-		return true;
+		vec3 reflected = reflect(r_in.direction(), rec.normal);			// Вектор отражения луча по длине прекции луча к 
+																		// нормали.
+		
+		reflected = unitv(reflected) + (fuzz * random_unit_vector());	// Для того, чтобы регулировать интенсивность размытия,
+																		// вводится коэф. fuzz, который позволяет регулировать 
+																		// размер единичной сферы (т.е. при необходимости делать
+																		// ее меньше.
+
+																		// Также необходимо нормализовать вектор отражения до 
+																		// единичного вектора, чтобы проверить отраженный луч на 
+																		// его направление и не допустить отражения обратно на 
+																		// родную поверхность.
+
+
+		scattered = ray(rec.p, reflected);								// Генерация рассеивающего луча.
+		attenuation = albedo;											// Доля отраженного цвета от поверхности (затухание
+																		// глобального освещения).
+		
+		return (dot(scattered.direction(), rec.normal) > 0);			// Нечеткое отражение должно не должно быть против 
+																		// направления нормали.
 	}
 };
 
