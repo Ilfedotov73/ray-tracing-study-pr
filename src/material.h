@@ -72,6 +72,16 @@ public:
 	}
 };
 
+/*
+ * Если материал применяется к сфере: для сферы с показателм преломления материала выше,
+ * чем у окружающей среды, то не существует такого угла падения, при котором произошло
+ * бы полное внутреннее отражение -- ни в точке входа луча в сферу, ни в точке выхода
+ * луча из сферы. Это связано с геометрией сферы: падающий под скользящим углом луч 
+ * всегда будет отклоняется на меньший угол, а зтем возвращаться к исходному углу при
+ * выходе. Чтобы продемонстрировать работу диэлектрического материала, можно выполнить
+ * полное внешнее отражение, где показатель преломления материала будет меньше,чем
+ * показатель преломления окружающей среды.
+*/
 class dielectric : public material
 {
 private: 
@@ -83,7 +93,7 @@ public:
 	bool scatter(const ray& r_in, const hit_record& rec,
 		color& attenuation, ray& scattered) const override
 	{
-		attenuation = color(1.0, 1.0, 1.0);
+		attenuation = color(1.0, 1.0, 1.0); // Затухание равно 1, т.к. стеклянная поверхность ничего не поглащает.
 		double ri = rec.front_face ? (1.0/refraction_index) : refraction_index; // Определение направления падающего луча.
 
 																				// Если луч пересекат поверхность со стороны среды eta,
@@ -93,11 +103,22 @@ public:
 																				// В противном случае, переход происходит в среду c меньшим 
 																				// показателм плотности (1.0).
 																			    
-																				// Вчера 19.07 -- С днем рождения Комбербетч.
+																				// 19.07 -- С днем рождения Комбербетч.
 																				
-		vec3 unit_direction = unitv(r_in.direction());							
-		vec3 refracted = refract(unit_direction, rec.normal, ri);				// Вычисление вектора преломления.
-		scattered = ray(rec.p, refracted);										// Генерация рассеивающего луча от точки преломления.
+		vec3 unit_direction = unitv(r_in.direction());
+		double cos_theta = std::fmin(dot(-unit_direction, rec.normal), 1.0); 
+		double sin_theta = std::sqrt(1.0 - cos_theta * cos_theta);
+		
+		bool cannot_refract = ri * sin_theta > 1.0; // sin(theta_prime)
+		
+		vec3 direction;
+
+		// Если угол sin(theta_prime) больше критического угла, то необходимо 
+		// выполнить полоное внутрнее (в случае сферы внешнее) отражение.
+		if (cannot_refract) { direction = reflect(unit_direction, rec.normal); }
+		else { direction = refract(unit_direction, rec.normal, ri); }
+
+		scattered = ray(rec.p, direction);										// Генерация преломленного или отраженного луча.
 		return true;
 	}
 };
