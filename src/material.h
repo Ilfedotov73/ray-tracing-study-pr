@@ -72,4 +72,33 @@ public:
 	}
 };
 
+class dielectric : public material
+{
+private: 
+	double refraction_index;
+public:
+	dielectric(double refraction_index) : refraction_index(refraction_index) {}
+
+	bool scatter(const ray& r_in, const hit_record& rec,
+		color& attenuation, ray& scattered) const override
+	{
+		attenuation = color(1.0, 1.0, 1.0);
+		double ri = rec.front_face ? (1.0/refraction_index) : refraction_index; // Определение направления падающего луча.
+
+																				// Если луч пересекат поверхность со стороны среды eta,
+																				// то вычисляется отношение eta/eta_prime, т.к. мы переходим
+																				// из одной среды (eta) в более плотную среду (eta_prime). 
+																		 
+																				// В противном случае, переход происходит в среду c меньшим 
+																				// показателм плотности (1.0).
+																			    
+																				// Вчера 19.07 -- С днем рождения Комбербетч.
+																				
+		vec3 unit_direction = unitv(r_in.direction());							
+		vec3 refracted = refract(unit_direction, rec.normal, ri);				// Вычисление вектора преломления.
+		scattered = ray(rec.p, refracted);										// Генерация рассеивающего луча от точки преломления.
+		return true;
+	}
+};
+
 #endif
