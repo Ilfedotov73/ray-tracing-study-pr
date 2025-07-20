@@ -75,7 +75,8 @@ public:
 class dielectric : public material
 {
 private: 
-	double refraction_index;
+	double refraction_index; // Отношение показателя преломления материала к показателю 
+							 // преломдения окружающей среды.
 public:
 	dielectric(double refraction_index) : refraction_index(refraction_index) {}
 
