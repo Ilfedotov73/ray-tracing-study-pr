@@ -87,6 +87,17 @@ class dielectric : public material
 private: 
 	double refraction_index; // Отношение показателя преломления материала к показателю 
 							 // преломдения окружающей среды.
+
+	// Аппроксимация зеркального отражения по Шлику: вычисляет приближенное
+	// значение фактора Френеля, который определяет долю зеркально отраженного
+	// света. Чем больше угол падения, тем больше значения фактора Френеля.
+	static double reflectance(double cosine, double refraction_index)
+	{
+		double r0 = (1 - refraction_index) / (1 + refraction_index);
+		
+		r0 *= r0;
+		return r0 + (1-r0)*std::pow((1-cosine),5);
+	}
 public:
 	dielectric(double refraction_index) : refraction_index(refraction_index) {}
 
@@ -115,7 +126,8 @@ public:
 
 		// Если угол sin(theta_prime) больше критического угла, то необходимо 
 		// выполнить полоное внутрнее (в случае сферы внешнее) отражение.
-		if (cannot_refract) { direction = reflect(unit_direction, rec.normal); }
+		if (cannot_refract || reflectance(cos_theta, ri) > random_double()) 
+			direction = reflect(unit_direction, rec.normal);
 		else { direction = refract(unit_direction, rec.normal, ri); }
 
 		scattered = ray(rec.p, direction);										// Генерация преломленного или отраженного луча.
