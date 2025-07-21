@@ -31,9 +31,9 @@ public:
 		/* Если сгенерированное вектор рассеивания будет противоположно вектору нормали */
 		if (scatter_dir.near_zero()) { scatter_dir = rec.normal; }
 
-		scattered = ray(rec.p, scatter_dir);				  // Генерация рассеивающего луча
-		attenuation = albedo;								  // Доля отраженного цвета от поверхности (затухание
-															  // глобального освещения).
+		scattered = ray(rec.p, scatter_dir);				    // Генерация рассеивающего луча
+		attenuation = albedo;								    // Доля отраженного цвета от поверхности (затухание
+															    // глобального освещения).
 		return true;
 	}
 };
@@ -105,6 +105,7 @@ public:
 		color& attenuation, ray& scattered) const override
 	{
 		attenuation = color(1.0, 1.0, 1.0); // Затухание равно 1, т.к. стеклянная поверхность ничего не поглащает.
+
 		double ri = rec.front_face ? (1.0/refraction_index) : refraction_index; // Определение направления падающего луча.
 
 																				// Если луч пересекат поверхность со стороны среды eta,

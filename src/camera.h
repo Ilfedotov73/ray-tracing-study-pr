@@ -97,6 +97,7 @@ private:
 		if (world.hit(r, interval(0.001, INF), rec)) {                 
 			ray   scattered;	// Рассеивающий луч
 			color attenuation;	// Цвет затухания интенсивности глобального освещения (цвета градиента sky).
+			
 			/* Вычисления отражения на основе материала поверхности */
 			if (rec.mat->scatter(r, rec, attenuation, scattered))
 				return attenuation * ray_color(scattered, max_depth-1, world);
@@ -119,6 +120,7 @@ private:
 	{
 		vec3 offset = sample_square(); // инициализация некоторой случайной точки из диапазона значений
 									   // единичной квадратной области.
+									   
 		point3 pixel_sample = PIXEL_LOC_00 + ((i + offset.x()) * PIXEL_DELTA_U) 
 										   + ((j + offset.y()) * PIXEL_DELTA_V); // определение сэмплируемого пикселя (т.е. случайного 
 																			     // пикселя вокруг (i,j) пикселя) из области просмотра.
@@ -137,7 +139,7 @@ public:
 	int    IMAGE_WIDTH       = 100;     // Ширина визуализируемого изображения в пикселях.
 	int	   SAMPLES_PER_PIXEL = 10;      // Количество случайных сэмплов (выборок) для каждого пикселя.
 	int	   MAX_DEPTH         = 10;		// Максимальное число отражений лучей в сцене.
-
+	double VFOV				 = 90;		// Вертикальный угол обзора.
 	void render(const hittable& world)
 	{
 		initialize();
@@ -152,7 +154,7 @@ public:
 
 					/* Antialiasing */
 					pixel_color += ray_color(r, MAX_DEPTH, world); // суммирование значение интенсивности цветов пикслей 
-														// вокруг (i.j) пикселя. 
+																   // вокруг (i.j) пикселя. 
 				}
 				write_color(std::cout, PIXEL_SAMPLES_SCALE * pixel_color); // записываем в выхондной поток > .ppm.
 																		   // pixel_color * (1.0 / SAMPLES_PER_PIXEL): 
