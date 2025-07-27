@@ -30,29 +30,38 @@ private:
 	point3 PIXEL_LOC_00;        // Позиция пикселя в (0,0)
 	vec3   PIXEL_DELTA_U;       // Смешение пикслея по горизонтали
 	vec3   PIXEL_DELTA_V;       // Смещение пикселя по вертикали
+	vec3   U, W, V;				// Ортонормированный базис
 
 	void initialize()
 	{
 		/* image settings */
 		IMAGE_HEIGHT = int(IMAGE_WIDTH / ASPECT_RATIO);
 		IMAGE_HEIGHT = (IMAGE_HEIGHT < 1) ? 1 : IMAGE_HEIGHT; // Высота изображения не должна быть < 1.
-
-		/* viewport settings */
-		double VIEWPORT_HEIGHT = 2.0; // высота просмотра выбрана произвольно
-		double VIEWPORT_WIDTH = VIEWPORT_HEIGHT * (double(IMAGE_WIDTH) / IMAGE_HEIGHT);
-		vec3   VIEWPORT_U = vec3(VIEWPORT_WIDTH, 0, 0);
-		vec3   VIEWPORT_V = vec3(0, -VIEWPORT_HEIGHT, 0);
-
+		
 		/* camera settings */
-		double FOCAL_LENGTH = 1.0;
-		point3 CAMERA_CENTER(0, 0, 0);
+		CAMERA_CENTER = LOOKFROM;
+		double FOCAL_LENGTH = (LOOKFROM - LOOKAT).length();
+		
+		/* viewport settings */
+		double theta = degrees_to_radians(VFOV);
+		double h = std::tan(theta/2);
+		
+		double VIEWPORT_HEIGHT = 2.0 * h * FOCAL_LENGTH ; // высота просмотра выбрана произвольно
+		double VIEWPORT_WIDTH = VIEWPORT_HEIGHT * (double(IMAGE_WIDTH) / IMAGE_HEIGHT);
+
+		W = unitv(LOOKFROM - LOOKAT);
+		U = unitv(cross(VUP, W));
+		V = cross(W, U);
+
+		vec3   VIEWPORT_U = VIEWPORT_WIDTH * U;		// Горизонтальный вектор области просмотра.
+		vec3   VIEWPORT_V = -VIEWPORT_HEIGHT * V;	// Вертикальный вектор области просмотра.
 
 		/* calculate delta vectotrs */
 		PIXEL_DELTA_U = VIEWPORT_U / IMAGE_WIDTH;
 		PIXEL_DELTA_V = VIEWPORT_V / IMAGE_HEIGHT;
 
 		/* calculate location viewport upper left/pixel(0,0) */
-		point3 VIEWPORT_UPPER_LEFT = CAMERA_CENTER - vec3(0, 0, FOCAL_LENGTH) - VIEWPORT_U / 2 - VIEWPORT_V / 2;
+		point3 VIEWPORT_UPPER_LEFT = CAMERA_CENTER - (FOCAL_LENGTH * W) - VIEWPORT_U / 2 - VIEWPORT_V / 2;
 		PIXEL_LOC_00 = VIEWPORT_UPPER_LEFT + 0.5 * (PIXEL_DELTA_U + PIXEL_DELTA_V);
 		
 		PIXEL_SAMPLES_SCALE = 1.0 / SAMPLES_PER_PIXEL;
@@ -135,11 +144,14 @@ private:
 
 public:
 	/* image settings */
-	double ASPECT_RATIO      = 1.0;     // Отношение ширины изображения к высоте.
-	int    IMAGE_WIDTH       = 100;     // Ширина визуализируемого изображения в пикселях.
-	int	   SAMPLES_PER_PIXEL = 10;      // Количество случайных сэмплов (выборок) для каждого пикселя.
-	int	   MAX_DEPTH         = 10;		// Максимальное число отражений лучей в сцене.
-	double VFOV				 = 90;		// Вертикальный угол обзора.
+	double ASPECT_RATIO      = 1.0;     		// Отношение ширины изображения к высоте.
+	int    IMAGE_WIDTH       = 100;     		// Ширина визуализируемого изображения в пикселях.
+	int	   SAMPLES_PER_PIXEL = 10;      		// Количество случайных сэмплов (выборок) для каждого пикселя.
+	int	   MAX_DEPTH         = 10;				// Максимальное число отражений лучей в сцене.
+	double VFOV				 = 90;				// Вертикальный угол обзора (поле зрения).
+	point3 LOOKFROM 		 = point3(0,0,0);	// Точка положения камеры.
+	point3 LOOKAT  			 = point3(0,0,-1);  // Точка направления камеры.  
+	vec3   VUP               = vec3(0,1,0);		// Вектор, направленный вверх относительно обзора.
 	void render(const hittable& world)
 	{
 		initialize();

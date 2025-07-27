@@ -34,12 +34,14 @@ int main()
 
 	/* world */
 	hittable_list WORLD;
-	
+
 	shared_ptr<material> mat1 = make_shared<lambertian>(color(0.8,0.8,0.0));
 	shared_ptr<material> mat2 = make_shared<lambertian>(color(0.1,0.2,0.5));
 	shared_ptr<material> mat3 = make_shared<dielectric>(1.50);           
 	shared_ptr<material> mat31 = make_shared<dielectric>(1.00 / 1.50);
-	shared_ptr<material> mat4 = make_shared<metal>(color(0.8,0.8,0.8), 0.25);
+	shared_ptr<material> mat4 = make_shared<metal>(color(0.8,0.6,0.8), 0.1);
+
+	double R = std::cos(PI/4);
 
 	WORLD.add(make_shared<sphere>(point3(0.0, -100.5, -1.0), 100.0, mat1));
 	WORLD.add(make_shared<sphere>(point3(0.0,  0.0,   -1.2), 0.5, mat2));
@@ -52,6 +54,11 @@ int main()
 	cam.IMAGE_WIDTH  = 400;
 	cam.SAMPLES_PER_PIXEL = 100;
 	cam.MAX_DEPTH = 50;
+
+	cam.VFOV = 20;
+	cam.LOOKFROM = point3(-2,2,1);
+	cam.LOOKAT = point3(0,0,-1);
+	cam.VUP = vec3(0,1,0);
 
 	cam.render(WORLD);
 }
