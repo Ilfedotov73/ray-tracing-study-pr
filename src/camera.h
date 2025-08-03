@@ -31,6 +31,8 @@ private:
 	vec3   PIXEL_DELTA_U;       // Смешение пикслея по горизонтали
 	vec3   PIXEL_DELTA_V;       // Смещение пикселя по вертикали
 	vec3   U, W, V;				// Ортонормированный базис
+	vec3   FOCUS_DISK_U, 		// Ортонормированный базис линзы
+		   FOCUS_DISK_V;		
 
 	void initialize()
 	{
@@ -40,13 +42,12 @@ private:
 		
 		/* camera settings */
 		CAMERA_CENTER = LOOKFROM;
-		double FOCAL_LENGTH = (LOOKFROM - LOOKAT).length();
 		
 		/* viewport settings */
 		double theta = degrees_to_radians(VFOV);
 		double h = std::tan(theta/2);
 		
-		double VIEWPORT_HEIGHT = 2.0 * h * FOCAL_LENGTH ; // высота просмотра выбрана произвольно
+		double VIEWPORT_HEIGHT = 2.0 * h * FOCUS_DIST; 
 		double VIEWPORT_WIDTH = VIEWPORT_HEIGHT * (double(IMAGE_WIDTH) / IMAGE_HEIGHT);
 
 		W = unitv(LOOKFROM - LOOKAT);
@@ -61,9 +62,14 @@ private:
 		PIXEL_DELTA_V = VIEWPORT_V / IMAGE_HEIGHT;
 
 		/* calculate location viewport upper left/pixel(0,0) */
-		point3 VIEWPORT_UPPER_LEFT = CAMERA_CENTER - (FOCAL_LENGTH * W) - VIEWPORT_U / 2 - VIEWPORT_V / 2;
+		point3 VIEWPORT_UPPER_LEFT = CAMERA_CENTER - (FOCUS_DIST * W) - VIEWPORT_U / 2 - VIEWPORT_V / 2;
 		PIXEL_LOC_00 = VIEWPORT_UPPER_LEFT + 0.5 * (PIXEL_DELTA_U + PIXEL_DELTA_V);
 		
+		/* calculate the camera focus lens basis vectorcs */
+		double focus_radius = FOCUS_DIST * std::tan(degrees_to_radians(FOCUS_ANGLE/2)); // Наклон радиуса линзы.
+		FOCUS_DISK_U = U * focus_radius;
+		FOCUS_DISK_V = V * focus_radius;
+
 		PIXEL_SAMPLES_SCALE = 1.0 / SAMPLES_PER_PIXEL;
 	}
 	
@@ -121,19 +127,25 @@ private:
 	}
 	
 	/*
-	 * Функция get_ray() возвращает луч исходящий из камеры в произольно выбранную 
-	 * точку вокруг местоположения (i,j) пикселя. Что представляет собой сглаживание
-	 * методм единичной квадратной области.
+	 * Функция get_ray() возвращает луч исходящий из фокусирующей линзы камеры в произольно 
+	 * выбранную точку вокруг местоположения (i,j) пикселя (область фокусировки камеры). 
+	 * Что представляет собой сглаживание методом единичной квадратной области.
 	*/
 	ray get_ray(int i, int j) const 
 	{
 		vec3 offset = sample_square(); // инициализация некоторой случайной точки из диапазона значений
 									   // единичной квадратной области.
-									   
+
+		// Определение сэмплируемого пикселя (т.е. случайного пикселя вокруг (i,j) пикселя) из области просмотра.							   
 		point3 pixel_sample = PIXEL_LOC_00 + ((i + offset.x()) * PIXEL_DELTA_U) 
-										   + ((j + offset.y()) * PIXEL_DELTA_V); // определение сэмплируемого пикселя (т.е. случайного 
-																			     // пикселя вокруг (i,j) пикселя) из области просмотра.
-		point3 ray_origin = CAMERA_CENTER; 
+										   + ((j + offset.y()) * PIXEL_DELTA_V); 
+		/*
+		 * Фокусирующая линза позволяет создать размытие изображения вне области фокусировки камеры. 
+		 * Для этого требуется испускать луч не из центра камеры, а из случайной точки на линзе в 
+		 * диапазоне [-1, 1] + учет размера линзы, размер которой пропорционален расстоянию от 
+		 * камеры до фокусирующей плоскости (области просмотра).
+		*/
+		point3 ray_origin = (FOCUS_ANGLE <= 0) ? CAMERA_CENTER : focus_disk_sample(); 
 		point3 ray_direction = pixel_sample - ray_origin; // компенсируем расстояние от точки начала координа до камеры, 
 														  // для корректного перечечения пикселя области просмотра.
 		return ray(ray_origin, ray_direction);
@@ -141,6 +153,13 @@ private:
 
 	/* Возращает вектор до случайной точки в единичной квадратной области, в диапазоне [-0.5,-0.5] - [0.5,0.5] */
 	vec3 sample_square() const { return vec3(random_double() - 0.5, random_double() - 0.5, 0); }
+
+	/* Возвращает случайную точку на линзе */
+	point3 focus_disk_sample() const 
+	{
+		vec3 lens = random_in_unit_disk();
+		return CAMERA_CENTER + (lens[0] * FOCUS_DISK_U) + (lens[1] * FOCUS_DISK_V);
+	}
 
 public:
 	/* image settings */
@@ -152,6 +171,10 @@ public:
 	point3 LOOKFROM 		 = point3(0,0,0);	// Точка положения камеры.
 	point3 LOOKAT  			 = point3(0,0,-1);  // Точка направления камеры.  
 	vec3   VUP               = vec3(0,1,0);		// Вектор, направленный вверх относительно обзора.
+
+	double FOCUS_ANGLE	     = 0;				// Угол наклона линзы
+	double FOCUS_DIST		 = 10;			    // Расстояние от камеры до плоскти идеальной фокусировки
+
 	void render(const hittable& world)
 	{
 		initialize();

@@ -183,13 +183,6 @@ inline vec3 random_on_hemisphere(const vec3& normal)
 	else { return -rndv_in_unit_sp; }
 }
 
-/************************************************************************ 
- * Функции reflect и refract требуют переосмысления и более правильной 
- * интерпретации с точки зрения геометрии. 
- * 
- * Вернуть и переписать !!!
-************************************************************************/
-
 /* 
  * Функция reflect принимает на вход падающий луч v и нормализованный вектор
  * нормали. Т.к. падающий луч скорее является физическим, то для работы 
@@ -225,6 +218,14 @@ inline vec3 refract(const vec3& uv, const vec3& n, double etai_over_etat)
 
 	vec3 r_out_paral = -std::sqrt(std::fabs(1.0 - r_out_perp.length_squared()))*n; // Нахождение параллели.
 	return r_out_perp + r_out_paral; 
+}
+
+inline vec3 random_in_unit_disk()
+{
+	for(;;) {
+		vec3 p = vec3(random_double(-1,1), random_double(-1,1), 0);
+		if (p.length_squared() < 1) { return p; }
+	}
 }
 
 #endif
