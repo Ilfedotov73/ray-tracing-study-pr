@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.31.6 FATAL_ERROR)
-
+cmake_minimum_required(VERSION 4.1.0)
 project(ray-tracing)
-add_executable(main src/main.cpp)
+include_directories(include)
+file (GLOB HEADER_FILES "src/*.h")
+add_executable(ray-tracing src/main.cpp ${HEADER_FILES})
