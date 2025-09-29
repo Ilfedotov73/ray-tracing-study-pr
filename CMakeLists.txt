@@ -1,5 +1,8 @@
-cmake_minimum_required(VERSION 4.1.0)
+cmake_minimum_required(VERSION 4.1.0) 
 project(ray-tracing)
 include_directories(include)
 file (GLOB HEADER_FILES "src/*.h")
-add_executable(ray-tracing src/main.cpp ${HEADER_FILES})
+add_executable(ray-tracing  
+	src/main.cpp
+	${HEADER_FILES}
+)
