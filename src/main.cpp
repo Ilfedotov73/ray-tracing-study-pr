@@ -49,6 +49,8 @@ int main()
 					/* diffuse */
 					color albedo = color::random() * color::random();
 					sphere_mat = make_shared<lambertian>(albedo);
+					point3 center_pos2 = center + vec3(0, random_double(0,0.5), 0);
+					WORLD.add(make_shared<sphere>(center, center_pos2, 0.2, sphere_mat));
 				}
 				else if (choose_mat < 0.95) {
 					/* metal */
@@ -75,8 +77,8 @@ int main()
 	
 	camera cam;
 	cam.ASPECT_RATIO = 16.0 / 9.0;
-	cam.IMAGE_WIDTH  = 1920;
-	cam.SAMPLES_PER_PIXEL = 500;
+	cam.IMAGE_WIDTH  = 400;
+	cam.SAMPLES_PER_PIXEL = 100;
 	cam.MAX_DEPTH = 50;
 
 	cam.VFOV = 20;
