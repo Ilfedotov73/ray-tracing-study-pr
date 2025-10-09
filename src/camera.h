@@ -18,8 +18,6 @@
 #ifndef CAMERA_H
 #define CANERA_H
 
-#include "hittable.h"
-#include "material.h"
 class camera
 {
 private:

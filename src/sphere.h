@@ -1,21 +1,41 @@
 ﻿#ifndef SPHERE_H
 #define SPHERE_H
 
-#include "hittable.h"
-
 class sphere : public hittable {
 private:
 	ray center;
 	double radius;
 	shared_ptr<material> mat;
+	aabb bbox;
 public:
 	/* Стационарная сфера */
 	sphere(const point3& static_center, double radius, shared_ptr<material> mat) 
-		: center(static_center, vec3(0,0,0)), radius(fmax(0, radius)), mat(mat) {}
+		: center(static_center, vec3(0,0,0)), radius(fmax(0, radius)), mat(mat) 
+	{
+		// Ограничение стационарной сферы объемом 
+		vec3 rvec = vec3(radius, radius, radius);
+		bbox = aabb(static_center - rvec, static_center + rvec);
+	}
 
 	/* Движущаяся сфера */
 	sphere(const point3& center_pos1, point3& center_pos2, double radius, shared_ptr<material> mat) 
-		: center(center_pos1, center_pos2 - center_pos1), radius(fmax(0, radius)), mat(mat) {}
+		: center(center_pos1, center_pos2 - center_pos1), radius(fmax(0, radius)), mat(mat) 
+	{
+		vec3 rvec = vec3(radius, radius, radius);
+		aabb box1(center.at(0) - rvec, center.at(0) + rvec);
+		aabb box2(center.at(1) - rvec, center.at(1) + rvec);
+
+		/**
+	     * Объединение ограничивающих объемов момента времени time = 0 и ограничивающего 
+		 * объема в момент временит time = 1.
+		 */
+		bbox = aabb(box1, box2); 
+	}
+
+	/**
+	 * \brief Функция bounding_box() возвращает текущий ограничивающей объем сферы.
+	 */
+	aabb bounding_box() const override { return bbox; }
 
 	/* hit() решает уравнение x^2 + y^2 + z^2 = r^2 как квадратное уравнение с
 	 * использование формулы нахождения дискриминанта. Уравнение x^2 + y^2 + z^2 = r^2

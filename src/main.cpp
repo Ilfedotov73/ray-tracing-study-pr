@@ -22,11 +22,6 @@
 ***********************************************************************************/
 
 #include "rt_settings.h"
-#include "hittable.h"
-#include "hittable_list.h"
-#include "sphere.h"
-#include "camera.h"
-#include "material.h"
 #include "time.h"
 
 int main() 
@@ -74,6 +69,8 @@ int main()
 
 	shared_ptr<material> mat3 = make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
 	WORLD.add(make_shared<sphere>(point3(4, 1, 0), 1.0, mat3));
+
+	WORLD = hittable_list(make_shared<bvh_node>(WORLD));
 	
 	camera cam;
 	cam.ASPECT_RATIO = 16.0 / 9.0;
