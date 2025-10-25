@@ -24,6 +24,34 @@
 #include "rt_settings.h"
 #include "time.h"
 
+void brick()
+{
+	shared_ptr<texture> brick_texture = make_shared<image_texture>("brick.jpg");
+	shared_ptr<material> surface = make_shared<lambertian>(brick_texture);
+	shared_ptr<sphere> obj = make_shared<sphere>(point3(0,0,0), 2, surface); 
+
+	camera cam;
+	cam.ASPECT_RATIO = 16.0 / 9.0;
+	cam.IMAGE_WIDTH = 400;
+	cam.SAMPLES_PER_PIXEL = 100;
+	cam.MAX_DEPTH = 50;
+	cam.VFOV = 20;
+	cam.LOOKFROM = point3(13, 2, 3);
+	cam.LOOKAT = point3(0, 0, 0);
+	cam.VUP = vec3(0, 1, 0);
+	cam.FOCUS_ANGLE = 0.6;
+	cam.FOCUS_DIST = 10.0;
+
+	clock_t start, stop;
+
+	start = clock();
+	cam.render(hittable_list(obj));
+	stop = clock();
+
+	double timer = ((double)(stop - start)) / CLOCKS_PER_SEC;
+	std::cerr << "took " << timer << " seconds.\n";
+}
+
 void bouncing_spheres()
 {
 	// settings
@@ -126,8 +154,9 @@ void checkered_spheres()
 
 int main() 
 {
-	switch (2) {
+	switch (3) {
 	case 1: bouncing_spheres(); break;
 	case 2: checkered_spheres(); break;
+	case 3: brick(); break;
 	}
 }

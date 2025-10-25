@@ -1,6 +1,8 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
+typedef unsigned char uchar;
+
 class texture
 {
 public:
@@ -42,6 +44,28 @@ public:
 		 */
 		bool isEven = (x + y + z) % 2 == 0;
 		return isEven ? even->value(u, v, p) : odd->value(u, v, p);
+	}
+};
+
+class image_texture : public texture 
+{
+private:
+	rtw_image image;
+public:
+	image_texture(const char* filename) : image(filename) {}
+	color value(double u, double v, const point3& p) const override
+	{
+		if (image.height() <= 0) { return color(0,1,1); }
+
+		u = interval(0,1).clamp(u);
+		v = 1.0 - interval(0,1).clamp(v);
+
+		int i = int(u*image.width());
+		int j = int(v*image.height());
+		const uchar* pixel = image.pixel_data(i,j);
+
+		double color_scale = 1.0/255.0;
+		return color(color_scale*pixel[0], color_scale*pixel[1], color_scale*pixel[2]);
 	}
 };
 
