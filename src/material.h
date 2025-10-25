@@ -16,9 +16,10 @@ public:
 class lambertian : public material
 {
 private:
-	color albedo;
+	shared_ptr<texture> tex;
 public:
-	lambertian(const color& albedo) : albedo(albedo) {}
+	lambertian(const color& albedo) : tex(make_shared<solid_color>(albedo)) {}
+	lambertian(shared_ptr<texture> tex) : tex(tex) {}
 
 	bool scatter(const ray& r_in, const hit_record& rec,
 		 color& attenuation, ray& scattered) const override
@@ -30,7 +31,7 @@ public:
 		if (scatter_dir.near_zero()) { scatter_dir = rec.normal; }
 
 		scattered = ray(rec.p, scatter_dir, r_in.time());		// Генерация рассеивающего луча
-		attenuation = albedo;								    // Доля отраженного цвета от поверхности (затухание
+		attenuation = tex->value(rec.u, rec.v, rec.p);          // Доля отраженного цвета от поверхности (затухание
 															    // глобального освещения).
 		return true;
 	}

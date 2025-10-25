@@ -31,6 +31,7 @@ inline int random_int(int min, int max) { return int(random_double(min, max+1));
 #include "aabb.h"
 #include "hittable.h"
 #include "hittable_list.h"
+#include "texture.h"
 #include "material.h"
 #include "camera.h"
 #include "sphere.h"

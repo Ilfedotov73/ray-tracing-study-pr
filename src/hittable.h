@@ -13,6 +13,7 @@ public:
 							  // и как от нее рассеивать свет.
 	double t;
 	bool front_face;
+	double u, v;
 
 	/*
 	 * Функция set_face_normal вычисляет направление нормали методом: нормаль всегда

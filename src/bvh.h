@@ -33,7 +33,13 @@ public:
 	bvh_node(hittable_list list) : bvh_node(list.objects, 0, list.objects.size()) {}
 	bvh_node(std::vector<shared_ptr<hittable>>& objects, size_t start, size_t end) 
 	{
-		int axis = random_int(0,2);
+		/* Генерация ограничивающего объема всей совокупности объектов сцены */
+		bbox = aabb::empty;
+		for (size_t object_index = start; object_index < end; ++object_index) {
+			bbox = aabb(bbox, objects[object_index]->bounding_box());
+		}
+
+		int axis = bbox.longest_axis();
 		bool (*comparator)(const shared_ptr<hittable> a, const shared_ptr<hittable> b) 
 			= (axis == 0) ? box_x_compare : (axis == 1) ? box_y_compare : box_z_compare;
 		
@@ -46,7 +52,7 @@ public:
 			right = objects[start + 1];
 		}
 		else {
-			/*
+			/**
 			 * Примитивы ограничивающего объема сортируются по минимальным заданным плоскостям,
 			 * выбирается середина и происходит разделение исходного ограничивающего объема на 
 			 * дочерние узлы.

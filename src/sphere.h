@@ -7,6 +7,15 @@ private:
 	double radius;
 	shared_ptr<material> mat;
 	aabb bbox;
+
+	static void get_sphere_uv(const point3& p, double& u, double& v)
+	{
+		double theta = acos(-p.y());
+		double phi = atan2(-p.z(), p.x()) + PI;
+
+		u = phi / (2*PI);
+		v = theta / PI;
+	}
 public:
 	/* Стационарная сфера */
 	sphere(const point3& static_center, double radius, shared_ptr<material> mat) 
@@ -110,6 +119,7 @@ public:
 																 // единичного вектора нормали, как того требует функция set_face_normal().
 		rec.set_face_normal(r, outward_normal);
 		rec.t = root;
+		get_sphere_uv(outward_normal, rec.u, rec.v);
 		rec.mat = mat;
 		
 		return true;
