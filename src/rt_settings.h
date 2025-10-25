@@ -1,4 +1,4 @@
-﻿#ifndef RT_SETTINGS_H
+#ifndef RT_SETTINGS_H
 #define RT_SEGGINGS_H
 
 #include <algorithm>

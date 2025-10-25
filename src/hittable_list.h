@@ -1,4 +1,4 @@
-﻿#ifndef HITTABLE_LIST_H
+#ifndef HITTABLE_LIST_H
 #define HITTABLE_LIST_H
 
 class hittable_list : public hittable {

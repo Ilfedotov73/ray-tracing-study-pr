@@ -1,4 +1,4 @@
-﻿#ifndef BVH_H
+#ifndef BVH_H
 #define BVH_H
 
 class bvh_node : public hittable

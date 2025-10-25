@@ -1,4 +1,4 @@
-﻿#ifndef AABB_H
+#ifndef AABB_H
 #define AABB_H
 
 /**
