@@ -24,6 +24,71 @@
 #include "rt_settings.h"
 #include "time.h"
 
+void simple_light()
+{
+	hittable_list WORLD;
+
+	shared_ptr<texture> brick_texture = make_shared<image_texture>("brick.jpg");
+	shared_ptr<material> surface = make_shared<lambertian>(brick_texture);
+	WORLD.add(make_shared<quad>(point3(-10, 0, -10),vec3(50,0,0),vec3(0, 0, 50),surface));
+
+	shared_ptr<material> diffcolor = make_shared<lambertian>(color(0.4, 0.2, 0.1));
+	WORLD.add(make_shared<sphere>(point3(0,2,0), 2, diffcolor));
+
+	shared_ptr<diffuse_light> difflight = make_shared<diffuse_light>(color(4,4,4));
+	WORLD.add(make_shared<sphere>(point3(0,7,0), 2, difflight));
+	WORLD.add(make_shared<quad>(point3(3,1,-2), vec3(2,0,0), vec3(0,2,0), difflight));
+
+	camera cam;
+	cam.ASPECT_RATIO = 16.0 / 9.0;
+	cam.IMAGE_WIDTH = 400;
+	cam.SAMPLES_PER_PIXEL = 100;
+	cam.MAX_DEPTH = 50;
+	cam.background = color(0,0,0);
+	cam.VFOV = 20;
+	cam.LOOKFROM = point3(26, 3, 6);
+	cam.LOOKAT = point3(0, 2, 0);
+	cam.VUP = vec3(0, 1, 0);
+	cam.FOCUS_ANGLE = 0;
+	cam.FOCUS_DIST = 10.0;
+
+	cam.render(WORLD);
+}
+
+void quads()
+{
+	hittable_list WORLD;
+
+	shared_ptr<texture> brick_texture = make_shared<image_texture>("brick.jpg");
+	shared_ptr<material> surface = make_shared<lambertian>(brick_texture);
+
+	shared_ptr<material> green 	= make_shared<lambertian>(color(0.2, 1.0, 0.2));
+	shared_ptr<material> blue 	= make_shared<lambertian>(color(0.2, 0.2, 1.0));
+	shared_ptr<material> orange = make_shared<lambertian>(color(1.0, 0.5, 0.0));
+	shared_ptr<material> teal 	= make_shared<lambertian>(color(0.2, 0.8, 0.8));
+
+	WORLD.add(make_shared<quad>(point3(-3,-2,5),vec3(0,0,-4),vec3(0,4,0),surface));
+	WORLD.add(make_shared<quad>(point3(-2,-2,0),vec3(4,0,0),vec3(0,4,0),green));
+	WORLD.add(make_shared<quad>(point3(3,-2,1),vec3(0,0,4),vec3(0,4,0),blue));
+	WORLD.add(make_shared<quad>(point3(-2,3,1),vec3(4,0,0),vec3(0,0,4),orange));
+	WORLD.add(make_shared<quad>(point3(-2,-3,5),vec3(4,0,0),vec3(0,0,-4),teal));
+
+	camera cam;
+	cam.ASPECT_RATIO = 1.0;
+	cam.IMAGE_WIDTH = 400;
+	cam.SAMPLES_PER_PIXEL = 100;
+	cam.MAX_DEPTH = 50;
+	cam.VFOV = 80;
+	cam.LOOKFROM = point3(0, 0, 9);
+	cam.LOOKAT = point3(0, 0, 0);
+	cam.VUP = vec3(0, 1, 0);
+	cam.FOCUS_ANGLE = 0;
+	cam.FOCUS_DIST = 10.0;
+	cam.background = color(0.70, 0.80, 1.00);
+
+	cam.render(WORLD);
+}
+
 void brick()
 {
 	shared_ptr<texture> brick_texture = make_shared<image_texture>("brick.jpg");
@@ -41,6 +106,7 @@ void brick()
 	cam.VUP = vec3(0, 1, 0);
 	cam.FOCUS_ANGLE = 0.6;
 	cam.FOCUS_DIST = 10.0;
+	cam.background = color(0.70, 0.80, 1.00);
 
 	clock_t start, stop;
 
@@ -92,7 +158,9 @@ void bouncing_spheres()
 	shared_ptr<material> mat1 = make_shared<dielectric>(1.5);
 	WORLD.add(make_shared<sphere>(point3(0, 1, 0), 1.0, mat1));
 
-	shared_ptr<material> mat2 = make_shared<lambertian>(color(0.4, 0.2, 0.1));
+	shared_ptr<texture> cow = make_shared<image_texture>("images.jpeg");
+	shared_ptr<material> mat2 = make_shared<lambertian>(cow);
+	//shared_ptr<material> mat2 = make_shared<lambertian>(color(0.4, 0.2, 0.1));
 	WORLD.add(make_shared<sphere>(point3(-4, 1, 0), 1.0, mat2));
 
 	shared_ptr<material> mat3 = make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
@@ -111,7 +179,7 @@ void bouncing_spheres()
 	cam.VUP = vec3(0, 1, 0);
 	cam.FOCUS_ANGLE = 0.6;
 	cam.FOCUS_DIST = 10.0;
-
+	cam.background = color(0.70, 0.80, 1.00);
 	clock_t start, stop;
 
 	start = clock();
@@ -141,7 +209,7 @@ void checkered_spheres()
 	cam.VUP = vec3(0, 1, 0);
 	cam.FOCUS_ANGLE = 0;
 	cam.FOCUS_DIST = 10.0;
-
+	cam.background = color(0.70, 0.80, 1.00);
 	clock_t start, stop;
 
 	start = clock();
@@ -154,9 +222,11 @@ void checkered_spheres()
 
 int main() 
 {
-	switch (3) {
+	switch (5) {
 	case 1: bouncing_spheres(); break;
 	case 2: checkered_spheres(); break;
 	case 3: brick(); break;
+	case 4: quads(); break;
+	case 5: simple_light(); break;
 	}
 }

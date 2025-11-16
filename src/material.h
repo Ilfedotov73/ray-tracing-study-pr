@@ -7,10 +7,8 @@ public:
 	virtual ~material() = default;
 	
 	virtual bool scatter(const ray& r_in, const hit_record& rec,
-		color& attenuation, ray& scattered) const
-	{
-		return false;
-	}
+		color& attenuation, ray& scattered) const { return false; }
+	virtual color emitted(double u, double v, const point3& p) const { return color(0,0,0); }
 };
 
 class lambertian : public material
@@ -130,9 +128,20 @@ public:
 			direction = reflect(unit_direction, rec.normal);
 		else { direction = refract(unit_direction, rec.normal, ri); }
 
-		scattered = ray(rec.p, direction, r_in.time());							// Генерация преломленного или отраженного луча.
+		scattered = ray(rec.p, direction, r_in.time());	 // Генерация преломленного или отраженного луча.
 		return true;
 	}
+};
+
+class diffuse_light : public material 
+{
+private:
+	shared_ptr<texture> tex;
+public:
+	diffuse_light(shared_ptr<texture> tex) : tex(tex) {}
+	diffuse_light(const color& emit) : tex(make_shared<solid_color>(emit)) {}
+
+	color emitted(double u, double v, const point3& p) const override { return tex->value(u,v,p); }
 };
 
 #endif

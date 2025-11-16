@@ -107,21 +107,20 @@ private:
 		if (max_depth <= 0) { return color(0,0,0); }
 
 		hit_record rec;
-		if (world.hit(r, interval(0.001, INF), rec)) {                 
-			ray   scattered;	// Рассеивающий луч
-			color attenuation;	// Цвет затухания интенсивности глобального освещения (цвета градиента sky).
-			
-			/* Вычисления отражения на основе материала поверхности */
-			if (rec.mat->scatter(r, rec, attenuation, scattered))
-				return attenuation * ray_color(scattered, max_depth-1, world);
-			return color(0,0,0);
-		}
-
+		if (!world.hit(r, interval(0.001, INF), rec)) { return background; }
+		ray   scattered;	// Рассеивающий луч
+		color attenuation;	// Цвет затухания интенсивности глобального освещения (цвета градиента sky).
+		color color_from_emission = rec.mat->emitted(rec.u, rec.v, rec.p);
+		
+		/* Вычисления отражения на основе материала поверхности */
+		if (!rec.mat->scatter(r, rec, attenuation, scattered)) { return color_from_emission; }
+		color color_from_scatter = attenuation * ray_color(scattered, max_depth-1, world);
+		return color_from_emission + color_from_scatter;
 		/* sky */
-		vec3 unit_direction = unitv(r.direction());
-		double a = 0.5 * (unit_direction.y() + 1.0); // [-1;1] -> [0;1], 0.0 <= a <= 1.0
+		//vec3 unit_direction = unitv(r.direction());
+		//double a = 0.5 * (unit_direction.y() + 1.0); // [-1;1] -> [0;1], 0.0 <= a <= 1.0
 		/* linear interpolation */
-		return (1.0 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0); // a = 1.0 -> синий, a = 0.0 -> белый
+		//return (1.0 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0); // a = 1.0 -> синий, a = 0.0 -> белый
 	}
 	
 	/*
@@ -173,6 +172,7 @@ public:
 
 	double FOCUS_ANGLE	     = 0;				// Угол наклона линзы
 	double FOCUS_DIST		 = 10;			    // Расстояние от камеры до плоскти идеальной фокусировки
+	color background;
 
 	void render(const hittable& world)
 	{

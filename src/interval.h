@@ -23,7 +23,7 @@ public:
 
 	double size() const { return max - min; }
 	
-	bool contrains(double x) const { return min <= x && x <= max; } // нестрогое неравенство
+	bool contains(double x) const { return min <= x && x <= max; } // нестрогое неравенство
 
 	bool surrounds(double x) const { return min < x && x < max; } // строгое неравенство
 
