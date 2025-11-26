@@ -4,7 +4,7 @@
 class sphere : public hittable {
 private:
 	ray center;
-	double radius;
+	float radius;
 	shared_ptr<material> mat;
 	aabb bbox;
 
@@ -22,18 +22,18 @@ private:
 	 * 				функции ata2(...) для phi и arccos(...) для theta. Функция atan2 определеяет угол против часовой
 	 * 				стрелки от оси x до точки пересечения по осям (-z,x). 
 	 */
-	static void get_sphere_uv(const point3& p, double& u, double& v)
+	static void get_sphere_uv(const point3& p, float& u, float& v)
 	{
-		double theta = acos(-p.y());
-		double phi = atan2(-p.z(), p.x()) + PI;
+		float theta = acos(-p.y());
+		float phi = atan2(-p.z(), p.x()) + PI;
 
 		u = phi / (2*PI);
 		v = theta / PI;
 	}
 public:
 	/* Стационарная сфера */
-	sphere(const point3& static_center, double radius, shared_ptr<material> mat) 
-		: center(static_center, vec3(0,0,0)), radius(fmax(0, radius)), mat(mat) 
+	sphere(const point3& static_center, float radius, shared_ptr<material> mat) 
+		: center(static_center, vec3(0.0f,0.0f,0.0f)), radius(fmax(0.0f, radius)), mat(mat) 
 	{
 		// Ограничение стационарной сферы объемом 
 		vec3 rvec = vec3(radius, radius, radius);
@@ -41,8 +41,8 @@ public:
 	}
 
 	/* Движущаяся сфера */
-	sphere(const point3& center_pos1, point3& center_pos2, double radius, shared_ptr<material> mat) 
-		: center(center_pos1, center_pos2 - center_pos1), radius(fmax(0, radius)), mat(mat) 
+	sphere(const point3& center_pos1, point3& center_pos2, float radius, shared_ptr<material> mat) 
+		: center(center_pos1, center_pos2 - center_pos1), radius(fmax(0.0f, radius)), mat(mat) 
 	{
 		vec3 rvec = vec3(radius, radius, radius);
 		aabb box1(center.at(0) - rvec, center.at(0) + rvec);
@@ -111,17 +111,17 @@ public:
 	{
 		point3 current_center = center.at(r.time());
 		vec3 oc = current_center - r.origin();
-		double a = r.direction().length_squared();
-		double h = dot(r.direction(), oc);
-		double c = oc.length_squared() - radius*radius;
+		float a = r.direction().length_squared();
+		float h = dot(r.direction(), oc);
+		float c = oc.length_squared() - radius*radius;
 
-		double discriminant = h*h - a*c;
+		float discriminant = h*h - a*c;
 		if (discriminant < 0) { return false; }
 		
-		double sqrtd = std::sqrt(discriminant);
+		float sqrtd = std::sqrt(discriminant);
 
 		// Поиск ближайшего корня в допустимом диапазоне
-		double root = (h - sqrtd) / a;
+		float root = (h - sqrtd) / a;
 		if (!ray_t.surrounds(root)) { 
 			root = (h + sqrtd) / a;
 			if (!ray_t.surrounds(root)) { return false; }

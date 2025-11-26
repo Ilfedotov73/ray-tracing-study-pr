@@ -14,7 +14,7 @@ private:
     shared_ptr<material> mat;
     aabb bbox;
     vec3 normal;
-    double D;
+    float D;
 public:
     /**
      * @brief       Конструктор, создающий примитив -- четырехугольник (полигон).
@@ -57,18 +57,18 @@ public:
      */
     bool hit(const ray& r, interval ray_t,hit_record& rec) const override
     {
-        double denom = dot(normal, r.direction());
+        float denom = dot(normal, r.direction());
         
-        if (std::fabs(denom) < 1e-8) { return false; }
-        double t = (D - dot(normal, r.origin())) / denom;
+        if (std::fabs(denom) < 1e-8f) { return false; }
+        float t = (D - dot(normal, r.origin())) / denom;
 
         if (!ray_t.contains(t)) { return false; }
 
         point3 intersection = r.at(t);
 
         vec3 planar_hitpt_vec = intersection - Q;
-        double alpha = dot(w, cross(planar_hitpt_vec, v));
-        double beta = dot(w, cross(u, planar_hitpt_vec));
+        float alpha = dot(w, cross(planar_hitpt_vec, v));
+        float beta = dot(w, cross(u, planar_hitpt_vec));
 
         if (!is_interior(alpha, beta, rec)) { return false; }
 
@@ -94,8 +94,8 @@ public:
 
 	aabb bounding_box() const override { return bbox; }  
     
-    virtual bool is_interior(double a, double b, hit_record& rec) const {
-        interval unit_interval = interval(0,1);
+    virtual bool is_interior(float a, float b, hit_record& rec) const {
+        interval unit_interval = interval(0.0f,1.0f);
 
         if (!unit_interval.contains(a) || !unit_interval.contains(b)) { return false; }
         rec.u = a;
@@ -103,5 +103,4 @@ public:
         return true;
     }
 };
-
 #endif

@@ -7,7 +7,7 @@ class texture
 {
 public:
 	virtual ~texture() = default;
-	virtual color value(double u, double v, const point3& p) const = 0;
+	virtual color value(float u, float v, const point3& p) const = 0;
 };
 
 class solid_color : public texture
@@ -16,23 +16,23 @@ private:
 	color albedo;
 public:
 	solid_color(const color& albedo) : albedo(albedo) {}
-	solid_color(const double red, double green, double blue) : solid_color(color(red,green,blue)) {}
-	color value(double u, double v, const point3& p) const override { return albedo; }
+	solid_color(const float red, float green, float blue) : solid_color(color(red,green,blue)) {}
+	color value(float u, float v, const point3& p) const override { return albedo; }
 };
 
 class checker_texture : public texture
 {
 private:
-	double inv_scale;			// Для влияния на четкость/нечеткость точки (размер клетчатого узора)
+	float inv_scale;			// Для влияния на четкость/нечеткость точки (размер клетчатого узора)
 	shared_ptr<texture> even;
 	shared_ptr<texture> odd;
 public:
-	checker_texture(double scale, shared_ptr<texture> even, shared_ptr<texture> odd)
-		:inv_scale(1.0 / scale), even(even), odd(odd) {}
-	checker_texture(double scale, const color& c1, const color& c2)
+	checker_texture(float scale, shared_ptr<texture> even, shared_ptr<texture> odd)
+		:inv_scale(1.0f / scale), even(even), odd(odd) {}
+	checker_texture(float scale, const color& c1, const color& c2)
 		:checker_texture(scale, make_shared<solid_color>(c1), make_shared<solid_color>(c2)) {}
 
-	color value(double u, double v, const point3& p) const override
+	color value(float u, float v, const point3& p) const override
 	{
 		int x = int(floor(inv_scale * p.x()));
 		int y = int(floor(inv_scale * p.y()));
@@ -50,21 +50,21 @@ public:
 class image_texture : public texture 
 {
 private:
-	rtw_image image;
+	rt_image image;
 public:
 	image_texture(const char* filename) : image(filename) {}
-	color value(double u, double v, const point3& p) const override
+	color value(float u, float v, const point3& p) const override
 	{
-		if (image.height() <= 0) { return color(0,1,1); }
+		if (image.height() <= 0) { return color(0.0f,1.0f,1.0f); }
 
-		u = interval(0,1).clamp(u);
-		v = 1.0 - interval(0,1).clamp(v);
+		u = interval(0.0f,1.0f).clamp(u);
+		v = 1.0f - interval(0.0f,1.0f).clamp(v);
 
 		int i = int(u*image.width());
 		int j = int(v*image.height());
 		const uchar* pixel = image.pixel_data(i,j);
 
-		double color_scale = 1.0/255.0;
+		double color_scale = 1.0f/255.0f;
 		return color(color_scale*pixel[0], color_scale*pixel[1], color_scale*pixel[2]);
 	}
 };

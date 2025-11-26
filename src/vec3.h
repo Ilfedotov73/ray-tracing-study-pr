@@ -47,19 +47,19 @@
 class vec3
 {																					
 public:
-	double e[3];
+	float e[3];
 
-	vec3() : e {0,0,0} {}
-	vec3(double e0, double e1, double e2) : e{e0, e1, e2} {}
+	vec3() : e {0.0f,0.0f,0.0f} {}
+	vec3(float e0, float e1, float e2) : e{e0, e1, e2} {}
 
-	double x() const { return e[0]; }
-	double y() const { return e[1]; }
-	double z() const { return e[2]; }
+	float x() const { return e[0]; }
+	float y() const { return e[1]; }
+	float z() const { return e[2]; }
 
 	vec3 operator-() const { return vec3(-e[0], -e[1], -e[2]); }
 
-	double  operator[](int i) const { return e[i]; }
-	double& operator[](int i) { return e[i]; }
+	float  operator[](int i) const { return e[i]; }
+	float& operator[](int i) { return e[i]; }
 
 	vec3& operator+=(const vec3& v)
 	{
@@ -69,7 +69,7 @@ public:
 		return *this;
 	}
 
-	vec3& operator*=(double t)
+	vec3& operator*=(float t)
 	{
 		e[0] *= t;
 		e[1] *= t;
@@ -77,19 +77,19 @@ public:
 		return *this;
 	}
 
-	vec3& operator/=(double t) { return *this *= 1 / t; }
+	vec3& operator/=(float t) { return *this *= 1.0f / t; }
 	
 	/* magnitude */
-	double length() const { return std::sqrt(length_squared()); }
+	float length() const { return std::sqrt(length_squared()); }
 	
-	double length_squared() const { return e[0]*e[0] + e[1]*e[1] + e[2]*e[2]; }
+	float length_squared() const { return e[0]*e[0] + e[1]*e[1] + e[2]*e[2]; }
 
-	static vec3 random() { return vec3(random_double(), random_double(), random_double()); }
-	static vec3 random(double min, double max) { return vec3(random_double(min, max), random_double(min, max), random_double(min, max)); }
+	static vec3 random() { return vec3(random_float(), random_float(), random_float()); }
+	static vec3 random(float min, float max) { return vec3(random_float(min, max), random_float(min, max), random_float(min, max)); }
 
 	bool near_zero() const
 	{
-		double s = 1e-8; // 0.0000001
+		float s = 1e-8f; // 0.0000001
 		return(std::fabs(e[0]) < s) && (std::fabs(e[1]) < s) && (std::fabs(e[2]) <s );
 	}
 
@@ -131,7 +131,7 @@ inline vec3 operator*(const vec3& u, const vec3& v)
 }
 
 /* скалярное умножение */
-inline vec3 operator*(double t, const vec3& v)
+inline vec3 operator*(float t, const vec3& v)
 {
 	return vec3(
 		t*v.e[0],
@@ -140,12 +140,12 @@ inline vec3 operator*(double t, const vec3& v)
 	);
 }
 
-inline vec3 operator*(const vec3& v, double t) { return t * v; }
+inline vec3 operator*(const vec3& v, float t) { return t * v; }
 
-inline vec3 operator/(const vec3& v, double t) { return (1/t) * v; }
+inline vec3 operator/(const vec3& v, float t) { return (1/t) * v; }
 
 /* фунции произведения векторов в декартовой с.к.: dot(), cross() */
-inline double dot(const vec3& u, const vec3& v)
+inline float dot(const vec3& u, const vec3& v)
 {
 	return u.e[0] * v.e[0]
 		+  u.e[1] * v.e[1]
@@ -162,13 +162,21 @@ inline vec3 cross(const vec3& u, const vec3& v)
 /* функция нахождения единичегого вектора - нормализация */
 inline vec3 unitv(const vec3& v) { return v/v.length(); } 
 
+inline float distance(const vec3& u, const vec3& v) 
+{
+	float dx = u.x() - v.x();
+	float dy = u.y() - v.y();
+	float dz = u.z() - v.z();
+	return sqrt(dx*dx + dy*dy + dz*dz);
+}
+
 /* Random method by reflection */
 inline vec3 random_unit_vector()
 {
 	for (;;) {
-		vec3 p = vec3::random(-1,1);                                 // Создаем случайный вектор в области единичной сфер
-		double lensq = p.length_squared();
-		if (1e-160 < lensq && lensq <= 1) { return p/sqrt(lensq); }  // Нормализуем до единичного вектора 
+		vec3 p = vec3::random(-1.0f,1.0f);                                 // Создаем случайный вектор в области единичной сфер
+		float lensq = p.length_squared();
+		if (1e-160f < lensq && lensq <= 1.0f) { return p/sqrt(lensq); }  // Нормализуем до единичного вектора 
 																	 // 10^-160 чтобы избежать фиктивного вектора при векторе,
 																	 // компоненты которого очень близки к нулю.
 	}
@@ -177,7 +185,7 @@ inline vec3 random_unit_vector()
 inline vec3 random_on_hemisphere(const vec3& normal)
 {
 	vec3 rndv_in_unit_sp = random_unit_vector();
-	if (dot(rndv_in_unit_sp, normal) > 0.0) { return rndv_in_unit_sp; } // Если случайный вектор находится в правильной 
+	if (dot(rndv_in_unit_sp, normal) > 0.0f) { return rndv_in_unit_sp; } // Если случайный вектор находится в правильной 
 																		// полусфере, то скалярное произведение случайного 
 																		// вектора на нормаль будет положительно
 	else { return -rndv_in_unit_sp; }
@@ -194,7 +202,7 @@ inline vec3 random_on_hemisphere(const vec3& normal)
  * алгебры (важно совпадение по наравлению вектор v с нормалью), функция 
  * имеет вид: v - 2dot(v,n)n.
 */
-inline vec3 reflect(const vec3& v, const vec3& n) { return v - 2*dot(v,n)*n; }
+inline vec3 reflect(const vec3& v, const vec3& n) { return v - 2.0f*dot(v,n)*n; }
 
 /*
  * Функция refract основана на законе Снеллиуса, который позволяет вычислить 
@@ -205,9 +213,9 @@ inline vec3 reflect(const vec3& v, const vec3& n) { return v - 2*dot(v,n)*n; }
  * индекс преломления. Сам же индекс преломления означает то, во сколько раз
  * скорость света будет замедлена (или ускорена) при переходе в новую среду.
 */
-inline vec3 refract(const vec3& uv, const vec3& n, double etai_over_etat)
+inline vec3 refract(const vec3& uv, const vec3& n, float etai_over_etat)
 {
-	double cos_theta = std::fmin(dot(-uv, n), 1.0);				// Т.к. падаюший луч uv физический, его необходимо 
+	float cos_theta = std::fmin(dot(-uv, n), 1.0f);				// Т.к. падаюший луч uv физический, его необходимо 
 																// инвертировать в обратную сторону.
 
 	vec3 r_out_perp = etai_over_etat * (uv + cos_theta * n);	// Проекция падающего луча на нормаль с учетом индекса 
@@ -216,15 +224,15 @@ inline vec3 refract(const vec3& uv, const vec3& n, double etai_over_etat)
 																// В результате будет получени перпендикуляр к прелом-
 																// ленному лучу.
 
-	vec3 r_out_paral = -std::sqrt(std::fabs(1.0 - r_out_perp.length_squared()))*n; // Нахождение параллели.
+	vec3 r_out_paral = -std::sqrt(std::fabs(1.0f - r_out_perp.length_squared()))*n; // Нахождение параллели.
 	return r_out_perp + r_out_paral; 
 }
 
 inline vec3 random_in_unit_disk()
 {
 	for(;;) {
-		vec3 p = vec3(random_double(-1,1), random_double(-1,1), 0);
-		if (p.length_squared() < 1) { return p; }
+		vec3 p = vec3(random_float(-1,1), random_float(-1.0f,1.0f), 0.0f);
+		if (p.length_squared() < 1.0f) { return p; }
 	}
 }
 

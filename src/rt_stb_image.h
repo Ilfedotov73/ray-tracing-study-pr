@@ -1,5 +1,5 @@
-#ifndef RTW_STB_IMAGE_H
-#define RTW_STB_IMAGE_H
+#ifndef RT_STB_IMAGE_H
+#define RT_STB_IMAGE_H
 
 // Disable strict warnings for this header from the Microsoft Visual C++ compiler.
 #ifdef _MSC_VER
@@ -10,13 +10,9 @@
 #define STBI_FAILURE_USERMSG
 #include "stb_image.h"
 
-#include <cstdlib>
-#include <iostream>
-#include <string>
-
 typedef unsigned char uchar;
 
-class rtw_image 
+class rt_image 
 {
 private:
 const int   bytes_per_pixel = 3;
@@ -50,8 +46,8 @@ static int clamp(int x, int low, int high)
     return high - 1;
 }
 public:
-    rtw_image() {}
-    rtw_image(const char* image_filename) 
+    rt_image() {}
+    rt_image(const char* image_filename) 
     {
         std::string filename = std::string(image_filename);
         char* imgdir = getenv("RTW_IMAGES");
@@ -68,7 +64,7 @@ public:
 
         std::cerr << "ERROR: Could no load image file '" << image_filename << "'.\n";
     }
-    ~rtw_image() {
+    ~rt_image() {
         delete[] bdata;
         STBI_FREE(fdata);
     }

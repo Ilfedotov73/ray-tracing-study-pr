@@ -5,7 +5,7 @@
 * > b - направление луча;
 * > t - параметр функции, действительное число. Изменяя значение t, можно пере-
 * мещать точку вдоль линии на интервале [-inf, +inf].
-* Функция at(double t) в ray, рассчитывает значение P(t).
+* Функция at(float t) в ray, рассчитывает значение P(t).
 * 
 * Поведение/свойства объекта типа ray():
 * В классе ray определены два приватных поля: point3 orig и vec3 dir
@@ -26,16 +26,16 @@ class ray
 private:
 	point3 orig; //(0,0,0) 
 	vec3 dir;    //(0,0,0) 
-	double tm;
+	float tm;
 public:
 	ray() {}
-	ray(const point3& origin, const vec3& direction, double time) : orig(origin), dir(direction), tm(time) {}
-	ray(const point3& origin, const vec3& direction) : ray(origin, direction, 0) {}
+	ray(const point3& origin, const vec3& direction, float time) : orig(origin), dir(direction), tm(time) {}
+	ray(const point3& origin, const vec3& direction) : ray(origin, direction, 0.0f) {}
 
 	const point3& origin() const { return orig; }
 	const vec3& direction() const { return dir; }
-	double time() const { return tm; }
+	float time() const { return tm; }
 
-	point3 at(double t) const { return orig + t*dir;}
+	point3 at(float t) const { return orig + t*dir;}
 };
 #endif

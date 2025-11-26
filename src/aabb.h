@@ -18,7 +18,7 @@ private:
 	 *			должна иметь почти нулевой размер по осям, в плоскости которых находится четырехугольник.  					 		 	
 	 */
 	void pad_to_minimus() {
-		double delta = 0.0001;
+		float delta = 0.0001f;
 		if (x.size() < delta) { x = x.expand(delta); }
 		if (y.size() < delta) { y = y.expand(delta); }
 		if (z.size() < delta) { z = z.expand(delta); }
@@ -71,14 +71,14 @@ public:
 			const interval& ax = axis_interval(axis);
 
 			// Направление луча в измерении плоскости.
-			const double adinv = 1.0 / ray_dir[axis]; 
+			const float adinv = 1.0f / ray_dir[axis]; 
 
 			/**
 			 * @brief	На примире вычисления точки пересечения ограничивающей плоскости x0:
 			 * 			t0 = (x0-Qx)/dx, где Qx - начальная точка луча, dx - направление луча.
 			 */
-			double t0 = (ax.min - ray_orig[axis]) * adinv;
-			double t1 = (ax.max - ray_orig[axis]) * adinv;
+			float t0 = (ax.min - ray_orig[axis]) * adinv;
+			float t1 = (ax.max - ray_orig[axis]) * adinv;
 
 			/**
 			 * @brief	Если луч направлен в обратном направлении, то точка t1 будет меньше,

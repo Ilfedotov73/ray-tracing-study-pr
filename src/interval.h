@@ -4,11 +4,11 @@
 class interval
 {
 public:
-	double min, max;
+	float min, max;
 	static const interval empty, universe;
 
 	interval() : min(+INF), max(-INF) {} // дефолтный интервал пустой!
-	interval(double min, double max) : min(min), max(max) {}
+	interval(float min, float max) : min(min), max(max) {}
 
 	/* 
 	 * \brief Опередение ограничивающего объема протяженностью от границы ограничивающего
@@ -21,22 +21,22 @@ public:
 		max = a.max >= b.max ? a.max : b.max;
 	}
 
-	double size() const { return max - min; }
+	float size() const { return max - min; }
 	
-	bool contains(double x) const { return min <= x && x <= max; } // нестрогое неравенство
+	bool contains(float x) const { return min <= x && x <= max; } // нестрогое неравенство
 
-	bool surrounds(double x) const { return min < x && x < max; } // строгое неравенство
+	bool surrounds(float x) const { return min < x && x < max; } // строгое неравенство
 
-	double clamp(double x) const
+	float clamp(float x) const
 	{
 		if (x < min) { return min; }
 		if (x > max) { return max;}
 		return x;
 	}
 
-	interval expand(double delta) const
+	interval expand(float delta) const
 	{
-		double padding = delta/2;
+		float padding = delta/2.0f;
 		return interval(min - padding, max + padding);
 	}
 }; 

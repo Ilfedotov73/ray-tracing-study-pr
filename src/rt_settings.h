@@ -4,23 +4,26 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdlib>
+#include <string>
 #include <iostream>
+#include <fstream>
 #include <limits>
 #include <memory>
 #include <vector>
+#include <utility>
 
 using std::make_shared;
 using std::shared_ptr;
 
 /* Constants */
-const double INF = std::numeric_limits<double>::infinity();
-const double PI = 3.1415926535897932385;
+const float INF = std::numeric_limits<float>::infinity();
+const float PI = 3.1415926535897932385f;
 
 /* Utility Functions */
-inline double degrees_to_radians(double degrees) { return degrees * PI / 180.0; }
-inline double random_double() { return std::rand() / (RAND_MAX + 1.0); } // случайное число в [0,1)
-inline double random_double(double min, double max) { return min + (max-min)*random_double(); } // случайное число в [min, max)
-inline int random_int(int min, int max) { return int(random_double(min, max+1)); }
+inline float degrees_to_radians(float degrees) { return degrees * PI / 180.0f; }
+inline float random_float() { return std::rand() / (RAND_MAX + 1.0f); } // случайное число в [0,1)
+inline float random_float(float min, float max) { return min + (max-min)*random_float(); } // случайное число в [min, max)
+inline int random_int(int min, int max) { return int(random_float(min, max+1)); }
 
 /* Common Headers */
 #include "vec3.h"
@@ -30,12 +33,13 @@ inline int random_int(int min, int max) { return int(random_double(min, max+1));
 #include "aabb.h"
 #include "hittable.h"
 #include "hittable_list.h"
-#include "rtw_stb_image.h"
+#include "rt_stb_image.h"
 #include "texture.h"
 #include "material.h"
 #include "camera.h"
 #include "sphere.h"
 #include "quad.h"
 #include "bvh.h"
+#include "rt_obj_loader.h"
 
 #endif

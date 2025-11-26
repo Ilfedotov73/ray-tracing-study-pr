@@ -30,27 +30,27 @@
 
 using color = vec3;
 
-inline double liner_to_gamma(double linear_component)
+inline float liner_to_gamma(float linear_component)
 {
 	if (linear_component > 0) { return std::sqrt(linear_component); }
-	return 0;
+	return 0.0f;
 }
 
 void write_color(std::ostream& out, const color& pix_color)
 {
-	double r = pix_color.x();
-	double g = pix_color.y();
-	double b = pix_color.z();
+	float r = pix_color.x();
+	float g = pix_color.y();
+	float b = pix_color.z();
 
 	r = liner_to_gamma(r);
 	g = liner_to_gamma(g);
 	b = liner_to_gamma(b);
 
 	/* преобразование значений компонента в диапазоне [0,1] в диапазон байтов [0,255] */
-	static const interval intensity(0.000, 0.999); // clipping
-	int rbyte = int(255.999 * intensity.clamp(r));
-	int gbyte = int(255.999 * intensity.clamp(g));
-	int bbyte = int(255.998 * intensity.clamp(b));
+	static const interval intensity(0.000f, 0.999f); // clipping
+	int rbyte = int(255.999f * intensity.clamp(r));
+	int gbyte = int(255.999f * intensity.clamp(g));
+	int bbyte = int(255.998f * intensity.clamp(b));
 
 	out << rbyte << ' ' << gbyte << ' ' << bbyte << '\n';
 }

@@ -8,7 +8,7 @@ public:
 	
 	virtual bool scatter(const ray& r_in, const hit_record& rec,
 		color& attenuation, ray& scattered) const { return false; }
-	virtual color emitted(double u, double v, const point3& p) const { return color(0,0,0); }
+	virtual color emitted(float u, float v, const point3& p) const { return color(0.0f,0.0f,0.0f); }
 };
 
 class lambertian : public material
@@ -39,9 +39,9 @@ class metal : public material
 {
 private:
 	color albedo;
-	double fuzz;
+	float fuzz;
 public:
-	metal(const color& albedo, double fuzz) : albedo(albedo), fuzz(fuzz < 1 ? fuzz:1) {}
+	metal(const color& albedo, float fuzz) : albedo(albedo), fuzz(fuzz < 1 ? fuzz:1.0f) {}
 
 	bool scatter(const ray& r_in, const hit_record& rec,
 		 color& attenuation, ray& scattered) const override
@@ -82,28 +82,28 @@ public:
 class dielectric : public material
 {
 private: 
-	double refraction_index; // Отношение показателя преломления материала к показателю 
+	float refraction_index; // Отношение показателя преломления материала к показателю 
 							 // преломдения окружающей среды.
 
 	// Аппроксимация зеркального отражения по Шлику: вычисляет приближенное
 	// значение фактора Френеля, который определяет долю зеркально отраженного
 	// света. Чем больше угол падения, тем больше значения фактора Френеля.
-	static double reflectance(double cosine, double refraction_index)
+	static float reflectance(float cosine, float refraction_index)
 	{
-		double r0 = (1 - refraction_index) / (1 + refraction_index);
+		float r0 = (1.0f - refraction_index) / (1.0f + refraction_index);
 		
 		r0 *= r0;
-		return r0 + (1-r0)*std::pow((1-cosine),5);
+		return r0 + (1-r0)*std::pow((1.0f-cosine),5.0f);
 	}
 public:
-	dielectric(double refraction_index) : refraction_index(refraction_index) {}
+	dielectric(float refraction_index) : refraction_index(refraction_index) {}
 
 	bool scatter(const ray& r_in, const hit_record& rec,
 		color& attenuation, ray& scattered) const override
 	{
-		attenuation = color(1.0, 1.0, 1.0); // Затухание равно 1, т.к. стеклянная поверхность ничего не поглащает.
+		attenuation = color(1.0f, 1.0f, 1.0f); // Затухание равно 1, т.к. стеклянная поверхность ничего не поглащает.
 
-		double ri = rec.front_face ? (1.0/refraction_index) : refraction_index; // Определение направления падающего луча.
+		float ri = rec.front_face ? (1.0f/refraction_index) : refraction_index; // Определение направления падающего луча.
 
 																				// Если луч пересекат поверхность со стороны среды eta,
 																				// то вычисляется отношение eta/eta_prime, т.к. мы переходим
@@ -115,8 +115,8 @@ public:
 																				// 19.07 -- С днем рождения Комбербетч.
 																				
 		vec3 unit_direction = unitv(r_in.direction());
-		double cos_theta = std::fmin(dot(-unit_direction, rec.normal), 1.0); 
-		double sin_theta = std::sqrt(1.0 - cos_theta * cos_theta);
+		float cos_theta = std::fmin(dot(-unit_direction, rec.normal), 1.0f); 
+		float sin_theta = std::sqrt(1.0f - cos_theta * cos_theta);
 		
 		bool cannot_refract = ri * sin_theta > 1.0; // sin(theta_prime)
 		
@@ -124,7 +124,7 @@ public:
 
 		// Если угол sin(theta_prime) больше критического угла, то необходимо 
 		// выполнить полоное внутрнее (в случае сферы внешнее) отражение.
-		if (cannot_refract || reflectance(cos_theta, ri) > random_double()) 
+		if (cannot_refract || reflectance(cos_theta, ri) > random_float()) 
 			direction = reflect(unit_direction, rec.normal);
 		else { direction = refract(unit_direction, rec.normal, ri); }
 
@@ -141,7 +141,7 @@ public:
 	diffuse_light(shared_ptr<texture> tex) : tex(tex) {}
 	diffuse_light(const color& emit) : tex(make_shared<solid_color>(emit)) {}
 
-	color emitted(double u, double v, const point3& p) const override { return tex->value(u,v,p); }
+	color emitted(float u, float v, const point3& p) const override { return tex->value(u,v,p); }
 };
 
 #endif

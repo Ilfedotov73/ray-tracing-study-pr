@@ -22,7 +22,7 @@ class camera
 {
 private:
 	int    IMAGE_HEIGHT;        // Ширина визуализируемого изображения в пикселях
-	double PIXEL_SAMPLES_SCALE; // Коэффициент цветовой гаммы для суммы выборок пикслей для усреднения 
+	float  PIXEL_SAMPLES_SCALE; // Коэффициент цветовой гаммы для суммы выборок пикслей для усреднения 
 								// суммы значений интенсивности пикселей области вокруг (i,j) пикселя.
 	point3 CAMERA_CENTER;       // Центр камеры 
 	point3 PIXEL_LOC_00;        // Позиция пикселя в (0,0)
@@ -42,11 +42,11 @@ private:
 		CAMERA_CENTER = LOOKFROM;
 		
 		/* viewport settings */
-		double theta = degrees_to_radians(VFOV);
-		double h = std::tan(theta/2);
+		float theta = degrees_to_radians(VFOV);
+		float h = std::tan(theta/2.0f);
 		
-		double VIEWPORT_HEIGHT = 2.0 * h * FOCUS_DIST; 
-		double VIEWPORT_WIDTH = VIEWPORT_HEIGHT * (double(IMAGE_WIDTH) / IMAGE_HEIGHT);
+		float VIEWPORT_HEIGHT = 2.0f * h * FOCUS_DIST; 
+		float VIEWPORT_WIDTH = VIEWPORT_HEIGHT * (float(IMAGE_WIDTH) / IMAGE_HEIGHT);
 
 		W = unitv(LOOKFROM - LOOKAT);
 		U = unitv(cross(VUP, W));
@@ -60,15 +60,15 @@ private:
 		PIXEL_DELTA_V = VIEWPORT_V / IMAGE_HEIGHT;
 
 		/* calculate location viewport upper left/pixel(0,0) */
-		point3 VIEWPORT_UPPER_LEFT = CAMERA_CENTER - (FOCUS_DIST * W) - VIEWPORT_U / 2 - VIEWPORT_V / 2;
-		PIXEL_LOC_00 = VIEWPORT_UPPER_LEFT + 0.5 * (PIXEL_DELTA_U + PIXEL_DELTA_V);
+		point3 VIEWPORT_UPPER_LEFT = CAMERA_CENTER - (FOCUS_DIST * W) - VIEWPORT_U / 2.0f - VIEWPORT_V / 2.0f;
+		PIXEL_LOC_00 = VIEWPORT_UPPER_LEFT + 0.5f * (PIXEL_DELTA_U + PIXEL_DELTA_V);
 		
 		/* calculate the camera focus lens basis vectorcs */
-		double focus_radius = FOCUS_DIST * std::tan(degrees_to_radians(FOCUS_ANGLE/2)); // Наклон радиуса линзы.
+		float focus_radius = FOCUS_DIST * std::tan(degrees_to_radians(FOCUS_ANGLE/2.0f)); // Наклон радиуса линзы.
 		FOCUS_DISK_U = U * focus_radius;
 		FOCUS_DISK_V = V * focus_radius;
 
-		PIXEL_SAMPLES_SCALE = 1.0 / SAMPLES_PER_PIXEL;
+		PIXEL_SAMPLES_SCALE = 1.0f / SAMPLES_PER_PIXEL;
 	}
 	
 	/*
@@ -104,10 +104,10 @@ private:
 	*/
 	color ray_color(const ray& r, int max_depth, const hittable& world) const
 	{
-		if (max_depth <= 0) { return color(0,0,0); }
+		if (max_depth <= 0) { return color(0.0f,0.0f,0.0f); }
 
 		hit_record rec;
-		if (!world.hit(r, interval(0.001, INF), rec)) { return background; }
+		if (!world.hit(r, interval(0.001f, INF), rec)) { return background; }
 		ray   scattered;	// Рассеивающий луч
 		color attenuation;	// Цвет затухания интенсивности глобального освещения (цвета градиента sky).
 		color color_from_emission = rec.mat->emitted(rec.u, rec.v, rec.p);
@@ -145,12 +145,12 @@ private:
 		point3 ray_origin = (FOCUS_ANGLE <= 0) ? CAMERA_CENTER : focus_disk_sample(); 
 		point3 ray_direction = pixel_sample - ray_origin; // компенсируем расстояние от точки начала координа до камеры, 
 														  // для корректного перечечения пикселя области просмотра.
-		double ray_time = random_double();
+		float ray_time = random_float();
 		return ray(ray_origin, ray_direction, ray_time);
 	}
 
 	/* Возращает вектор до случайной точки в единичной квадратной области, в диапазоне [-0.5,-0.5] - [0.5,0.5] */
-	vec3 sample_square() const { return vec3(random_double() - 0.5, random_double() - 0.5, 0); }
+	vec3 sample_square() const { return vec3(random_float() - 0.5f, random_float() - 0.5f, 0.0f); }
 
 	/* Возвращает случайную точку на линзе */
 	point3 focus_disk_sample() const 
@@ -161,17 +161,17 @@ private:
 
 public:
 	/* image settings */
-	double ASPECT_RATIO      = 1.0;     		// Отношение ширины изображения к высоте.
-	int    IMAGE_WIDTH       = 100;     		// Ширина визуализируемого изображения в пикселях.
-	int	   SAMPLES_PER_PIXEL = 10;      		// Количество случайных сэмплов (выборок) для каждого пикселя.
-	int	   MAX_DEPTH         = 10;				// Максимальное число отражений лучей в сцене.
-	double VFOV				 = 90;				// Вертикальный угол обзора (поле зрения).
-	point3 LOOKFROM 		 = point3(0,0,0);	// Точка положения камеры.
-	point3 LOOKAT  			 = point3(0,0,-1);  // Точка направления камеры.  
-	vec3   VUP               = vec3(0,1,0);		// Вектор, направленный вверх относительно обзора.
+	float  ASPECT_RATIO      = 1.0f;     				// Отношение ширины изображения к высоте.
+	int    IMAGE_WIDTH       = 100;     				// Ширина визуализируемого изображения в пикселях.
+	int	   SAMPLES_PER_PIXEL = 10;      				// Количество случайных сэмплов (выборок) для каждого пикселя.
+	int	   MAX_DEPTH         = 10;						// Максимальное число отражений лучей в сцене.
+	float  VFOV				 = 90.0f;					// Вертикальный угол обзора (поле зрения).
+	point3 LOOKFROM 		 = point3(0.0f,0.0f,0.0f);	// Точка положения камеры.
+	point3 LOOKAT  			 = point3(0.f,0.f,-1.f);  	// Точка направления камеры.  
+	vec3   VUP               = vec3(0.f,1.f,0.f);		// Вектор, направленный вверх относительно обзора.
 
-	double FOCUS_ANGLE	     = 0;				// Угол наклона линзы
-	double FOCUS_DIST		 = 10;			    // Расстояние от камеры до плоскти идеальной фокусировки
+	float FOCUS_ANGLE	     = 0.0f;					// Угол наклона линзы
+	float  FOCUS_DIST		 = 10.0f;			    	// Расстояние от камеры до плоскти идеальной фокусировки
 	color background;
 
 	void render(const hittable& world)
@@ -181,7 +181,7 @@ public:
 		for (int j = 0; j < IMAGE_HEIGHT; ++j) {
 			std::clog << "\rScanlines remaining: " << (IMAGE_HEIGHT - j) << ' ' << std::flush;
 			for (int i = 0; i < IMAGE_WIDTH; ++i) {
-				color pixel_color(0,0,0);
+				color pixel_color(0.0f,0.0f,0.0f);
 				/* sampling */
 				for (int sample = 0; sample < SAMPLES_PER_PIXEL; ++sample) { 
 					ray r = get_ray(i,j);	// на каждый (i,j) пиксель генерируется samples_per_pixel пикслей (сэмплов)
