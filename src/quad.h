@@ -42,7 +42,7 @@ public:
     {
         vec3 n = cross(u, v);
         normal = unitv(n);
-        D = dot(normal, Q);
+        D = -dot(normal, Q);
         w = n / dot(n,n);
 
         set_bounding_box();
@@ -60,7 +60,7 @@ public:
         float denom = dot(normal, r.direction());
         
         if (std::fabs(denom) < 1e-8f) { return false; }
-        float t = (D - dot(normal, r.origin())) / denom;
+        float t = (-D - dot(normal, r.origin())) / denom;
 
         if (!ray_t.contains(t)) { return false; }
 

@@ -39,6 +39,7 @@ inline int random_int(int min, int max) { return int(random_float(min, max+1)); 
 #include "camera.h"
 #include "sphere.h"
 #include "quad.h"
+#include "tri.h"
 #include "bvh.h"
 #include "rt_obj_loader.h"
 

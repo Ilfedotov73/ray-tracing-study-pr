@@ -29,24 +29,28 @@ void load_scene()
 	hittable_list WORLD; 
 
 	obj_loader loader; 
-	loader.load_models("test.obj");
+	loader.load_models("test.obj", "C:/Users/Ilfe/source/repos/ray-tracing-study-pr/build/Release");
 
 	WORLD.add(loader.get_sides());
 
+	shared_ptr<diffuse_light> difflight = make_shared<diffuse_light>(color(4.0f,4.0f,4.0f));
+	WORLD.add(make_shared<sphere>(point3(0.0f,4.0f,0.0f), 1.0f, difflight));
+	WORLD.add(make_shared<quad>(point3(3.0f,1.0f,-2.0f), vec3(2.0f,0.0f,0.0f), vec3(0.0f,2.0f,0.0f), difflight));
+
 	camera cam;
 
-	cam.ASPECT_RATIO = 1.0f;
-	cam.IMAGE_WIDTH = 300.0f;
+	cam.ASPECT_RATIO = 16.0f / 9.0f;
+	cam.IMAGE_WIDTH = 400.0f;
 	cam.SAMPLES_PER_PIXEL = 100.0f;
 	cam.MAX_DEPTH = 50.0f;
 	cam.background = color(0.0f,0.0f,0.0f);
 	cam.VFOV = 40.0f;
-	cam.LOOKFROM = point3(2.0f, 2.0f, 2.0f);
-	cam.LOOKAT = point3(0.0f,0.0f,0.f);
+	cam.LOOKFROM = point3(8.0f, 5.0f, 2.0f);
+	cam.LOOKAT = point3(0.0f,0.0f,0.0f);
 	cam.VUP = vec3(0.0f, 1.0f, 0.0f);
 	cam.FOCUS_ANGLE = 0.0f;
 	cam.FOCUS_DIST = 10.0f;
-	cam.background = color(0.70f, 0.80f, 1.00f);
+	cam.background = color(0.0f,0.0f,0.0f);
 
 	cam.render(WORLD);
 }

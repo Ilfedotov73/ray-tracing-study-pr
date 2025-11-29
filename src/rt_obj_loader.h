@@ -11,18 +11,16 @@ private:
 public:
     obj_loader() { sides = make_shared<hittable_list>(); }
 
-    void load_models(const char* filename) 
+    void load_models(const char* filename, const char* mtlsdir) 
     {
         tinyobj::attrib_t attrib;
         std::vector<tinyobj::shape_t> shapes;
         std::vector<tinyobj::material_t> materials;
         std::string warn, err;
         
-        if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filename, "", false)) {
+        if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filename, mtlsdir)) {
             std::cerr << warn << " " << err << ".\n";
         }
-
-        shared_ptr<material> green = make_shared<lambertian>(color(.12f, .45f, .15f));
 
         // Цикл по объектам.
         for (size_t s = 0, s_size = shapes.size(); s < s_size; ++s) { 
@@ -46,16 +44,29 @@ public:
                 }
                 index_offset += fv;
 
-                point3 v0 = point3(quad_vertices[0], quad_vertices[1], quad_vertices[2]);
-                point3 v1 = point3(quad_vertices[3], quad_vertices[4], quad_vertices[5]);
-                point3 v2 = point3(quad_vertices[6], quad_vertices[7], quad_vertices[8]);
-                point3 v3 = point3(quad_vertices[9], quad_vertices[10], quad_vertices[11]);
-
                 point3 Q = point3(quad_vertices[0], quad_vertices[1], quad_vertices[2]);
                 point3 U = point3(quad_vertices[3], quad_vertices[4], quad_vertices[5]) - Q;
-                point3 V = point3(quad_vertices[9], quad_vertices[10], quad_vertices[11]) - Q;
+                point3 V = point3(quad_vertices[6], quad_vertices[7], quad_vertices[8]) - Q;
+                
+                int material_id = shapes[s].mesh.material_ids[f];
 
-                sides->add(make_shared<quad>(Q, U, V, green));
+                shared_ptr<material> surface;
+
+                if (material_id >= 0) {
+                    tinyobj::material_t mat = materials[material_id];
+                    if (mat.diffuse_texname != "") {
+                        shared_ptr<texture> tex = make_shared<image_texture>(mat.diffuse_texname.c_str());
+                        surface = make_shared<lambertian>(tex);
+                    }
+                    else {
+                        surface = make_shared<lambertian>(color(mat.diffuse[0], mat.diffuse[1], mat.diffuse[2]));
+                    }
+                }
+                else {
+                    surface = make_shared<lambertian>(color(.8f, .8f, .8f));
+                }
+
+                sides->add(make_shared<tri>(Q, U, V, surface));
 
                 std:: cerr << "Quad vertices" << f << ": ";
                 for (int i = 0; i < fv; ++i) {
