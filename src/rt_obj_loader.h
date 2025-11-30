@@ -30,6 +30,7 @@ public:
             for (size_t f = 0, size = shapes[s].mesh.num_face_vertices.size(); f < size; ++f) {
                 size_t fv = size_t(shapes[s].mesh.num_face_vertices[f]);
                 std::vector<float> quad_vertices;
+                std::vector<std::pair<float, float>> quad_texcoords;
                 // Цикл по вершинам полигона.
                 for (size_t v = 0; v < fv; ++v) {
                     tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
@@ -37,6 +38,12 @@ public:
                     tinyobj::real_t vx = attrib.vertices[3*size_t(idx.vertex_index)+0];
                     tinyobj::real_t vy = attrib.vertices[3*size_t(idx.vertex_index)+1];
                     tinyobj::real_t vz = attrib.vertices[3*size_t(idx.vertex_index)+2];
+                    
+                    if (idx.texcoord_index >= 0) {
+                        tinyobj::real_t tx = attrib.texcoords[2*size_t(idx.texcoord_index)+0];
+                        tinyobj::real_t ty = attrib.texcoords[2*size_t(idx.texcoord_index)+1];
+                        quad_texcoords.push_back(std::make_pair(tx, ty));
+                    }
 
                     quad_vertices.push_back(vx);
                     quad_vertices.push_back(vy);
@@ -66,7 +73,7 @@ public:
                     surface = make_shared<lambertian>(color(.8f, .8f, .8f));
                 }
 
-                sides->add(make_shared<tri>(Q, U, V, surface));
+                sides->add(make_shared<tri>(Q, U, V, surface, quad_texcoords));
 
                 std:: cerr << "Quad vertices" << f << ": ";
                 for (int i = 0; i < fv; ++i) {
