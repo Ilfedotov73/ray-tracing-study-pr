@@ -25,6 +25,23 @@ public:
         // Цикл по объектам.
         for (size_t s = 0, s_size = shapes.size(); s < s_size; ++s) { 
             std::cerr << "Shape:" << s << "\n";
+
+            int material_id = shapes[s].mesh.material_ids[0];
+            shared_ptr<material> surface;
+            if (material_id >= 0) {
+                tinyobj::material_t mat = materials[material_id];
+                if (mat.diffuse_texname != "") {
+                    shared_ptr<texture> tex = make_shared<image_texture>(mat.diffuse_texname.c_str());
+                    surface = make_shared<lambertian>(tex);
+                }
+                else {
+                    surface = make_shared<lambertian>(color(mat.diffuse[0], mat.diffuse[1], mat.diffuse[2]));
+                }
+            }
+            else {
+                surface = make_shared<lambertian>(color(.8f, .8f, .8f));
+            }
+
             // Цикл по полигонам.
             size_t index_offset = 0;
             for (size_t f = 0, size = shapes[s].mesh.num_face_vertices.size(); f < size; ++f) {
@@ -55,24 +72,6 @@ public:
                 point3 U = point3(quad_vertices[3], quad_vertices[4], quad_vertices[5]) - Q;
                 point3 V = point3(quad_vertices[6], quad_vertices[7], quad_vertices[8]) - Q;
                 
-                int material_id = shapes[s].mesh.material_ids[f];
-
-                shared_ptr<material> surface;
-
-                if (material_id >= 0) {
-                    tinyobj::material_t mat = materials[material_id];
-                    if (mat.diffuse_texname != "") {
-                        shared_ptr<texture> tex = make_shared<image_texture>(mat.diffuse_texname.c_str());
-                        surface = make_shared<lambertian>(tex);
-                    }
-                    else {
-                        surface = make_shared<lambertian>(color(mat.diffuse[0], mat.diffuse[1], mat.diffuse[2]));
-                    }
-                }
-                else {
-                    surface = make_shared<lambertian>(color(.8f, .8f, .8f));
-                }
-
                 sides->add(make_shared<tri>(Q, U, V, surface, quad_texcoords));
 
                 std:: cerr << "Quad vertices" << f << ": ";

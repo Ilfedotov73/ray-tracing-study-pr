@@ -39,13 +39,13 @@ void load_scene()
 
 	camera cam;
 
-	cam.ASPECT_RATIO = 16.0f / 9.0f;
+	cam.ASPECT_RATIO = 2.0f;
 	cam.IMAGE_WIDTH = 400.0f;
 	cam.SAMPLES_PER_PIXEL = 100.0f;
 	cam.MAX_DEPTH = 50.0f;
-	cam.background = color(0.0f,0.0f,0.0f);
+	cam.background = color(0.83f,0.25f,0.96f);
 	cam.VFOV = 40.0f;
-	cam.LOOKFROM = point3(8.0f, 5.0f, 2.0f);
+	cam.LOOKFROM = point3(8.0f, 5.0f, 5.0f);
 	cam.LOOKAT = point3(0.0f,0.0f,0.0f);
 	cam.VUP = vec3(0.0f, 1.0f, 0.0f);
 	cam.FOCUS_ANGLE = 0.0f;
